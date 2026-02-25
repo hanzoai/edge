@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Hanzo Edge -- Browser Inference</title>
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      background: #000;
+      color: #e0e0e0;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 24px;
+    }
+
+    h1 { font-size: 24px; font-weight: 600; color: #fff; margin-bottom: 4px; }
+    .subtitle { font-size: 13px; color: #888; margin-bottom: 24px; }
+
+    .container {
+      width: 100%;
+      max-width: 720px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    /* --- status bar --- */
+    #status {
+      font-size: 13px;
+      padding: 8px 12px;
+      border-radius: 6px;
+      background: #111;
+      border: 1px solid #222;
+    }
+    #status.ok   { border-color: #2a4; color: #4c8; }
+    #status.busy { border-color: #a82; color: #db6; }
+    #status.err  { border-color: #a22; color: #e66; }
+
+    /* --- model URL input --- */
+    .load-section {
+      display: flex;
+      gap: 8px;
+    }
+    .load-section input {
+      flex: 1;
+      padding: 10px 12px;
+      font-size: 14px;
+      background: #111;
+      border: 1px solid #333;
+      border-radius: 6px;
+      color: #e0e0e0;
+      outline: none;
+    }
+    .load-section input:focus { border-color: #666; }
+
+    /* --- prompt --- */
+    textarea {
+      width: 100%;
+      min-height: 120px;
+      padding: 12px;
+      font-size: 14px;
+      font-family: 'SF Mono', 'Fira Code', 'Menlo', monospace;
+      background: #111;
+      border: 1px solid #333;
+      border-radius: 6px;
+      color: #e0e0e0;
+      resize: vertical;
+      outline: none;
+    }
+    textarea:focus { border-color: #666; }
+
+    /* --- controls --- */
+    .controls {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    .controls label { font-size: 13px; color: #999; display: flex; align-items: center; gap: 4px; }
+    .controls input[type="number"] {
+      width: 60px;
+      padding: 4px 6px;
+      font-size: 13px;
+      background: #111;
+      border: 1px solid #333;
+      border-radius: 4px;
+      color: #e0e0e0;
+      outline: none;
+    }
+
+    /* --- buttons --- */
+    button {
+      padding: 10px 20px;
+      font-size: 14px;
+      font-weight: 500;
+      border: 1px solid #333;
+      border-radius: 6px;
+      background: #111;
+      color: #e0e0e0;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+    button:hover:not(:disabled) { background: #222; }
+    button:disabled { opacity: 0.4; cursor: not-allowed; }
+    button.primary { background: #fff; color: #000; border-color: #fff; }
+    button.primary:hover:not(:disabled) { background: #ccc; border-color: #ccc; }
+
+    /* --- output --- */
+    #output {
+      width: 100%;
+      min-height: 160px;
+      max-height: 400px;
+      overflow-y: auto;
+      padding: 12px;
+      font-size: 14px;
+      font-family: 'SF Mono', 'Fira Code', 'Menlo', monospace;
+      line-height: 1.6;
+      background: #0a0a0a;
+      border: 1px solid #222;
+      border-radius: 6px;
+      white-space: pre-wrap;
+      word-wrap: break-word;
+    }
+
+    .info-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 12px;
+      color: #666;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div>
+      <h1>Hanzo Edge</h1>
+      <div class="subtitle">On-device AI inference via WebAssembly. No data leaves your browser.</div>
+    </div>
+
+    <div id="status" class="busy">Not loaded</div>
+
+    <!-- Model + tokenizer URLs -->
+    <div class="load-section">
+      <input id="modelUrl" type="text" placeholder="GGUF model URL (e.g. .../model-q4_0.gguf)">
+    </div>
+    <div class="load-section">
+      <input id="tokenizerUrl" type="text" placeholder="tokenizer.json URL" value="tokenizer.json">
+      <button class="primary" id="loadBtn" onclick="loadModel()">Load</button>
+    </div>
+
+    <!-- Prompt -->
+    <textarea id="prompt" placeholder="Enter your prompt here..." disabled>What is WebAssembly?</textarea>
+
+    <!-- Controls -->
+    <div class="controls">
+      <button class="primary" id="generateBtn" onclick="doGenerate()" disabled>Generate</button>
+      <button id="streamBtn" onclick="doStream()" disabled>Stream</button>
+      <button id="resetBtn" onclick="doReset()" disabled>Reset</button>
+      <label>Max tokens <input type="number" id="maxTokens" value="128" min="1" max="2048"></label>
+      <label>Temperature <input type="number" id="temperature" value="0.7" min="0" max="2" step="0.1"></label>
+    </div>
+
+    <!-- Output -->
+    <div id="output"></div>
+
+    <div class="info-row">
+      <span id="perf"></span>
+      <span id="version"></span>
+    </div>
+  </div>
+
+  <script type="module">
+    import init, { EdgeModel, get_version, get_device_info } from './pkg/edge_wasm.js';
+
+    let model = null;
+    let wasmReady = false;
+
+    // ---- status helpers ----
+
+    function setStatus(msg, cls) {
+      const el = document.getElementById('status');
+      el.textContent = msg;
+      el.className = cls || '';
+    }
+
+    function setEnabled(ready) {
+      document.getElementById('prompt').disabled = !ready;
+      document.getElementById('generateBtn').disabled = !ready;
+      document.getElementById('streamBtn').disabled = !ready;
+      document.getElementById('resetBtn').disabled = !ready;
+    }
+
+    // ---- init WASM module ----
+
+    async function initWasm() {
+      try {
+        setStatus('Initializing WASM runtime...', 'busy');
+        await init();
+        wasmReady = true;
+        document.getElementById('version').textContent =
+          `v${get_version()} | ${get_device_info()}`;
+        setStatus('WASM ready. Enter model URL and click Load.', 'ok');
+      } catch (e) {
+        setStatus(`WASM init failed: ${e.message}`, 'err');
+      }
+    }
+
+    // ---- fetch with progress ----
+
+    async function fetchBytes(url, label) {
+      const resp = await fetch(url);
+      if (!resp.ok) throw new Error(`${label}: HTTP ${resp.status}`);
+
+      const total = parseInt(resp.headers.get('content-length') || '0', 10);
+      const reader = resp.body.getReader();
+      const chunks = [];
+      let received = 0;
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        chunks.push(value);
+        received += value.length;
+        if (total > 0) {
+          const pct = ((received / total) * 100).toFixed(0);
+          const mb = (received / 1048576).toFixed(1);
+          setStatus(`${label}: ${mb} MB (${pct}%)`, 'busy');
+        } else {
+          setStatus(`${label}: ${(received / 1048576).toFixed(1)} MB`, 'busy');
+        }
+      }
+
+      const result = new Uint8Array(received);
+      let offset = 0;
+      for (const chunk of chunks) {
+        result.set(chunk, offset);
+        offset += chunk.length;
+      }
+      return result;
+    }
+
+    // ---- load model ----
+
+    window.loadModel = async function() {
+      if (!wasmReady) { setStatus('WASM not ready', 'err'); return; }
+
+      const modelUrl = document.getElementById('modelUrl').value.trim();
+      const tokenizerUrl = document.getElementById('tokenizerUrl').value.trim();
+
+      if (!modelUrl) { setStatus('Enter a GGUF model URL', 'err'); return; }
+      if (!tokenizerUrl) { setStatus('Enter a tokenizer URL', 'err'); return; }
+
+      document.getElementById('loadBtn').disabled = true;
+      setEnabled(false);
+
+      try {
+        const modelBytes = await fetchBytes(modelUrl, 'Model');
+        const tokenizerBytes = await fetchBytes(tokenizerUrl, 'Tokenizer');
+
+        setStatus('Building model in WASM...', 'busy');
+        model = new EdgeModel(modelBytes, tokenizerBytes);
+
+        setStatus('Model loaded and ready.', 'ok');
+        setEnabled(true);
+      } catch (e) {
+        setStatus(`Load failed: ${e.message}`, 'err');
+        console.error(e);
+      } finally {
+        document.getElementById('loadBtn').disabled = false;
+      }
+    };
+
+    // ---- generate (blocking) ----
+
+    window.doGenerate = function() {
+      if (!model) return;
+      const prompt = document.getElementById('prompt').value;
+      const maxTokens = parseInt(document.getElementById('maxTokens').value) || 128;
+      const temperature = parseFloat(document.getElementById('temperature').value) || 0.7;
+
+      setEnabled(false);
+      setStatus('Generating...', 'busy');
+      document.getElementById('output').textContent = '';
+
+      const t0 = performance.now();
+
+      try {
+        const text = model.generate(prompt, maxTokens, temperature);
+        const elapsed = ((performance.now() - t0) / 1000).toFixed(2);
+        document.getElementById('output').textContent = text;
+        document.getElementById('perf').textContent = `${elapsed}s`;
+        setStatus('Done.', 'ok');
+      } catch (e) {
+        setStatus(`Error: ${e.message}`, 'err');
+        console.error(e);
+      } finally {
+        setEnabled(true);
+      }
+    };
+
+    // ---- stream (token-by-token, yields to event loop) ----
+
+    window.doStream = function() {
+      if (!model) return;
+      const prompt = document.getElementById('prompt').value;
+      const maxTokens = parseInt(document.getElementById('maxTokens').value) || 128;
+      const temperature = parseFloat(document.getElementById('temperature').value) || 0.7;
+      const output = document.getElementById('output');
+
+      setEnabled(false);
+      setStatus('Streaming...', 'busy');
+      output.textContent = '';
+
+      const t0 = performance.now();
+      let tokenCount = 0;
+
+      try {
+        model.generate_stream(prompt, maxTokens, temperature, (token) => {
+          output.textContent += token;
+          tokenCount++;
+        });
+
+        const elapsed = (performance.now() - t0) / 1000;
+        const tps = (tokenCount / elapsed).toFixed(1);
+        document.getElementById('perf').textContent =
+          `${tokenCount} tokens in ${elapsed.toFixed(2)}s (${tps} tok/s)`;
+        setStatus('Done.', 'ok');
+      } catch (e) {
+        setStatus(`Error: ${e.message}`, 'err');
+        console.error(e);
+      } finally {
+        setEnabled(true);
+      }
+    };
+
+    // ---- reset KV cache ----
+
+    window.doReset = function() {
+      if (!model) return;
+      model.reset();
+      document.getElementById('output').textContent = '';
+      document.getElementById('perf').textContent = '';
+      setStatus('KV cache cleared.', 'ok');
+    };
+
+    // ---- boot ----
+    initWasm();
+  </script>
+</body>
+</html>
