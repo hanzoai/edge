@@ -130,10 +130,9 @@ fn sample_token(logits: &Tensor, temperature: f64, top_p: f64) -> Result<u32> {
     }
 
     // Temperature scaling.
-    let logits = (&logits / temperature)
-        .map_err(|e| anyhow::anyhow!("temperature scaling: {e}"))?;
-    let probs = candle_nn::ops::softmax(&logits, 0)
-        .map_err(|e| anyhow::anyhow!("softmax: {e}"))?;
+    let logits =
+        (&logits / temperature).map_err(|e| anyhow::anyhow!("temperature scaling: {e}"))?;
+    let probs = candle_nn::ops::softmax(&logits, 0).map_err(|e| anyhow::anyhow!("softmax: {e}"))?;
     let probs_vec: Vec<f32> = probs
         .to_vec1()
         .map_err(|e| anyhow::anyhow!("to_vec1: {e}"))?;
@@ -175,11 +174,7 @@ fn decode_token(tokenizer: &tokenizers::Tokenizer, token: u32) -> Option<String>
 /// Check if a token is an end-of-sequence marker.
 fn is_eos(tokenizer: &tokenizers::Tokenizer, token: u32) -> bool {
     // Check the tokenizer's configured EOS.
-    if let Some(id) = tokenizer
-        .get_added_vocabulary()
-        .get_vocab()
-        .get("</s>")
-    {
+    if let Some(id) = tokenizer.get_added_vocabulary().get_vocab().get("</s>") {
         if token == *id {
             return true;
         }

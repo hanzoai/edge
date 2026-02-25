@@ -69,12 +69,7 @@ pub fn execute(
             reloaded.weights
         };
 
-        let result = bench_one_iteration(
-            &mut weights,
-            &prompt_tokens,
-            max_tokens,
-            device,
-        )?;
+        let result = bench_one_iteration(&mut weights, &prompt_tokens, max_tokens, device)?;
 
         eprintln!(
             " TTFT={:.1}ms, {:.1} tok/s, {} tokens",

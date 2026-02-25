@@ -74,7 +74,7 @@ impl TokenizerWrapper {
 
     /// Check whether a token is the end-of-sequence marker.
     pub fn is_eos(&self, token: u32) -> bool {
-        self.eos_token_id.map_or(false, |eos| token == eos)
+        self.eos_token_id == Some(token)
     }
 
     pub fn bos_token_id(&self) -> Option<u32> {

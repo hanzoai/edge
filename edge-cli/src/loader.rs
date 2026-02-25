@@ -43,14 +43,11 @@ pub struct GgufMetadata {
 ///
 /// If `model_id` is a local path ending in .gguf, use it directly.
 /// Otherwise treat it as a HuggingFace repo and download.
-pub fn resolve_model(
-    model_id: &str,
-    revision: Option<&str>,
-) -> Result<(PathBuf, PathBuf)> {
+pub fn resolve_model(model_id: &str, revision: Option<&str>) -> Result<(PathBuf, PathBuf)> {
     let path = Path::new(model_id);
 
     // Local .gguf file.
-    if path.extension().map_or(false, |e| e == "gguf") {
+    if path.extension().is_some_and(|e| e == "gguf") {
         if !path.exists() {
             bail!("GGUF file not found: {}", path.display());
         }
@@ -74,10 +71,7 @@ pub fn resolve_model(
 ///
 /// Looks for a single .gguf file in the repo. If multiple exist,
 /// picks the first one found. Also downloads tokenizer.json.
-fn download_from_hub(
-    model_id: &str,
-    revision: Option<&str>,
-) -> Result<(PathBuf, PathBuf)> {
+fn download_from_hub(model_id: &str, revision: Option<&str>) -> Result<(PathBuf, PathBuf)> {
     let pb = ProgressBar::new_spinner();
     pb.set_style(
         ProgressStyle::default_spinner()
@@ -105,7 +99,10 @@ fn download_from_hub(
 
     // Try common GGUF filenames in order of preference.
     let gguf_candidates = [
-        format!("{}.gguf", model_id.split('/').last().unwrap_or(model_id)),
+        format!(
+            "{}.gguf",
+            model_id.split('/').next_back().unwrap_or(model_id)
+        ),
         "model.gguf".to_string(),
         "model-q4_0.gguf".to_string(),
         "model-q4_k_m.gguf".to_string(),
@@ -136,11 +133,7 @@ fn download_from_hub(
 }
 
 /// Load a GGUF model and tokenizer, ready for inference.
-pub fn load_model(
-    model_id: &str,
-    revision: Option<&str>,
-    device: &Device,
-) -> Result<LoadedModel> {
+pub fn load_model(model_id: &str, revision: Option<&str>, device: &Device) -> Result<LoadedModel> {
     let (gguf_path, tok_path) = resolve_model(model_id, revision)?;
 
     tracing::info!(path = %gguf_path.display(), "loading GGUF weights");
@@ -173,8 +166,8 @@ pub fn read_gguf_metadata(path: &Path) -> Result<GgufMetadata> {
         .with_context(|| format!("cannot stat {}", path.display()))?
         .len();
 
-    let mut file = std::fs::File::open(path)
-        .with_context(|| format!("cannot open {}", path.display()))?;
+    let mut file =
+        std::fs::File::open(path).with_context(|| format!("cannot open {}", path.display()))?;
 
     let content = gguf_file::Content::read(&mut file)
         .map_err(|e| anyhow::anyhow!("failed to read GGUF: {e}"))?;
@@ -190,7 +183,12 @@ pub fn read_gguf_metadata(path: &Path) -> Result<GgufMetadata> {
 
     let get_u64 = |key: &str| -> u64 {
         md.get(key)
-            .and_then(|v| v.to_u32().ok().map(|x| x as u64).or_else(|| v.to_u64().ok()))
+            .and_then(|v| {
+                v.to_u32()
+                    .ok()
+                    .map(|x| x as u64)
+                    .or_else(|| v.to_u64().ok())
+            })
             .unwrap_or(0)
     };
 

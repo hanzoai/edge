@@ -224,8 +224,7 @@ pub fn load_model(config: &ModelConfig) -> Result<(Box<dyn Model>, TokenizerWrap
         std::fs::File::open(&model_path)
             .with_context(|| format!("cannot open {}", model_path.display()))?,
     );
-    let gguf_content = gguf_file::Content::read(&mut file)
-        .context("failed to parse GGUF file")?;
+    let gguf_content = gguf_file::Content::read(&mut file).context("failed to parse GGUF file")?;
 
     // Extract max sequence length from metadata (default 4096).
     let max_seq_len = gguf_content
@@ -249,9 +248,8 @@ pub fn load_model(config: &ModelConfig) -> Result<(Box<dyn Model>, TokenizerWrap
     // --- Load tokenizer ---
     let tok_path = resolve_tokenizer_path(config)?;
     tracing::info!(path = %tok_path.display(), "loading tokenizer");
-    let mut tokenizer = TokenizerWrapper::from_file(
-        tok_path.to_str().context("non-UTF8 tokenizer path")?,
-    )?;
+    let mut tokenizer =
+        TokenizerWrapper::from_file(tok_path.to_str().context("non-UTF8 tokenizer path")?)?;
 
     // Override EOS from GGUF metadata if available.
     // Many GGUF files store the EOS token ID in metadata.
@@ -269,10 +267,7 @@ fn gguf_content_eos_id(path: &Path) -> Result<Option<u32>> {
     let content = gguf_file::Content::read(&mut file)?;
 
     // Try "tokenizer.ggml.eos_token_id" first, then "general.eos_token_id".
-    for key in &[
-        "tokenizer.ggml.eos_token_id",
-        "general.eos_token_id",
-    ] {
+    for key in &["tokenizer.ggml.eos_token_id", "general.eos_token_id"] {
         if let Some(v) = content.metadata.get(*key) {
             if let Ok(id) = v.to_u32() {
                 return Ok(Some(id));

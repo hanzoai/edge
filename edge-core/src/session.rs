@@ -54,10 +54,7 @@ impl<'a> InferenceSession<'a> {
     ///
     /// Returns an iterator of `Result<String>` where each item is
     /// the text fragment for a single generated token.
-    pub fn generate_stream<'b>(
-        &'b mut self,
-        prompt: &str,
-    ) -> Result<StreamIter<'b, 'a>> {
+    pub fn generate_stream<'b>(&'b mut self, prompt: &str) -> Result<StreamIter<'b, 'a>> {
         let prompt_tokens = self.tokenizer.encode(prompt, true)?;
         if prompt_tokens.is_empty() {
             bail!("prompt must not be empty");
@@ -103,7 +100,11 @@ impl<'a> InferenceSession<'a> {
         for i in 1..self.params.max_tokens {
             let pos = prompt_tokens.len() + i - 1;
             if pos >= self.model.max_seq_len() {
-                tracing::warn!(pos, max = self.model.max_seq_len(), "reached max sequence length");
+                tracing::warn!(
+                    pos,
+                    max = self.model.max_seq_len(),
+                    "reached max sequence length"
+                );
                 break;
             }
 
@@ -187,14 +188,13 @@ impl<'b, 'a: 'b> Iterator for StreamIter<'b, 'a> {
             }
         };
 
-        let next_token =
-            match sample_token(&logits, &self.session.params, &self.all_tokens) {
-                Ok(t) => t,
-                Err(e) => {
-                    self.done = true;
-                    return Some(Err(e));
-                }
-            };
+        let next_token = match sample_token(&logits, &self.session.params, &self.all_tokens) {
+            Ok(t) => t,
+            Err(e) => {
+                self.done = true;
+                return Some(Err(e));
+            }
+        };
 
         self.pos += 1;
 
