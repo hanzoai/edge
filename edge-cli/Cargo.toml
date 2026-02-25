@@ -1,0 +1,21 @@
+[package]
+name = "edge-cli"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "CLI for Hanzo Edge on-device inference"
+
+[[bin]]
+name = "hanzo-edge"
+path = "src/main.rs"
+
+[dependencies]
+edge-core = { path = "../edge-core" }
+anyhow = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+tracing = { workspace = true }
+tracing-subscriber = { workspace = true }
+clap = { version = "4", features = ["derive"] }
+hf-hub = "0.4"

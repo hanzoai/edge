@@ -1,0 +1,24 @@
+[package]
+name = "edge-wasm"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "WASM bindings for Hanzo Edge inference"
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+candle-core = { workspace = true }
+candle-nn = { workspace = true }
+candle-transformers = { workspace = true }
+tokenizers = { workspace = true, features = ["unstable_wasm"] }
+serde = { workspace = true }
+serde_json = { workspace = true }
+anyhow = { workspace = true }
+wasm-bindgen = "0.2"
+wasm-bindgen-futures = "0.4"
+js-sys = "0.3"
+getrandom = { version = "0.2", features = ["js"] }
+console_error_panic_hook = "0.1"
