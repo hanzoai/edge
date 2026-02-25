@@ -229,23 +229,21 @@ fn current_rss_bytes() -> u64 {
 
 #[cfg(target_os = "macos")]
 fn macos_rss() -> u64 {
-    use std::mem;
-    unsafe {
-        let mut info: libc::mach_task_basic_info_data_t = mem::zeroed();
-        let mut count = (mem::size_of::<libc::mach_task_basic_info_data_t>()
-            / mem::size_of::<libc::natural_t>()) as libc::mach_msg_type_number_t;
-        let kr = libc::task_info(
-            libc::mach_task_self(),
-            libc::MACH_TASK_BASIC_INFO,
-            &mut info as *mut _ as libc::task_info_t,
-            &mut count,
-        );
-        if kr == libc::KERN_SUCCESS {
-            info.resident_size as u64
-        } else {
-            0
-        }
-    }
+    // Use `ps` to read RSS — avoids deprecated libc::mach_task_self.
+    let pid = std::process::id();
+    std::process::Command::new("ps")
+        .args(["-o", "rss=", "-p", &pid.to_string()])
+        .output()
+        .ok()
+        .and_then(|out| {
+            String::from_utf8_lossy(&out.stdout)
+                .trim()
+                .parse::<u64>()
+                .ok()
+        })
+        // ps reports RSS in KiB.
+        .map(|kb| kb * 1024)
+        .unwrap_or(0)
 }
 
 #[cfg(target_os = "linux")]
