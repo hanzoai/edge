@@ -1,10 +1,13 @@
 [package]
-name = "edge-wasm"
+name = "hanzo-edge-wasm"
 version.workspace = true
 edition.workspace = true
 license.workspace = true
 repository.workspace = true
-description = "WASM bindings for Hanzo Edge inference"
+description = "Hanzo Edge WebAssembly — run AI models in the browser"
+homepage = "https://edge.hanzo.ai"
+keywords = ["ai", "inference", "edge", "llm", "gguf"]
+categories = ["science", "command-line-utilities"]
 
 [lib]
 crate-type = ["cdylib", "rlib"]

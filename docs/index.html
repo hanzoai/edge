@@ -1,0 +1,733 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hanzo Edge - On-Device AI Inference Runtime</title>
+<meta name="description" content="Run AI models on any device. On-device inference runtime for macOS, Linux, Windows, iOS, Android, and Web.">
+<meta name="theme-color" content="#000000">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' fill='%23000'/><text x='50' y='72' font-family='system-ui' font-size='64' font-weight='700' fill='%23fff' text-anchor='middle'>H</text></svg>">
+<style>
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  background: #000;
+  color: #f5f5f5;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+a {
+  color: #f5f5f5;
+  text-decoration: none;
+  transition: opacity 0.15s ease;
+}
+
+a:hover {
+  opacity: 0.7;
+}
+
+code, pre {
+  font-family: 'SF Mono', 'Cascadia Code', 'Fira Code', 'JetBrains Mono', Menlo, Consolas, monospace;
+}
+
+/* Layout */
+
+.container {
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+section {
+  padding: 80px 0;
+  border-bottom: 1px solid #222;
+}
+
+section:last-of-type {
+  border-bottom: none;
+}
+
+/* Nav */
+
+nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  background: rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid #222;
+  padding: 0 24px;
+  height: 56px;
+  display: flex;
+  align-items: center;
+}
+
+.nav-inner {
+  max-width: 1080px;
+  margin: 0 auto;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.nav-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 600;
+  font-size: 15px;
+  letter-spacing: -0.01em;
+}
+
+.nav-logo {
+  width: 28px;
+  height: 28px;
+  background: #f5f5f5;
+  color: #000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: 16px;
+  border-radius: 4px;
+}
+
+.nav-links {
+  display: flex;
+  gap: 24px;
+  font-size: 14px;
+}
+
+.nav-links a {
+  color: #888;
+}
+
+.nav-links a:hover {
+  color: #f5f5f5;
+  opacity: 1;
+}
+
+/* Hero */
+
+.hero {
+  padding: 160px 0 100px;
+  text-align: center;
+}
+
+.hero h1 {
+  font-size: clamp(48px, 8vw, 80px);
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  line-height: 1.05;
+  margin-bottom: 16px;
+}
+
+.hero .tagline {
+  font-size: clamp(18px, 3vw, 22px);
+  color: #888;
+  margin-bottom: 48px;
+  font-weight: 400;
+}
+
+.install-block {
+  display: inline-block;
+  background: #111;
+  border: 1px solid #222;
+  border-radius: 8px;
+  padding: 14px 24px;
+  font-family: 'SF Mono', Menlo, Consolas, monospace;
+  font-size: 14px;
+  color: #ccc;
+  cursor: pointer;
+  transition: border-color 0.15s ease;
+  position: relative;
+}
+
+.install-block:hover {
+  border-color: #444;
+}
+
+.install-block .copy-hint {
+  position: absolute;
+  top: -28px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 11px;
+  color: #666;
+  font-family: system-ui, sans-serif;
+  opacity: 0;
+  transition: opacity 0.15s ease;
+  pointer-events: none;
+  white-space: nowrap;
+}
+
+.install-block:hover .copy-hint {
+  opacity: 1;
+}
+
+.install-block.copied .copy-hint {
+  opacity: 1;
+  color: #aaa;
+}
+
+/* Section headers */
+
+.section-label {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: #666;
+  margin-bottom: 12px;
+  font-weight: 600;
+}
+
+.section-title {
+  font-size: clamp(28px, 4vw, 36px);
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  margin-bottom: 48px;
+}
+
+/* Features grid */
+
+.features-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+}
+
+.feature-card {
+  background: #0a0a0a;
+  border: 1px solid #1a1a1a;
+  border-radius: 10px;
+  padding: 32px 28px;
+  transition: border-color 0.2s ease;
+}
+
+.feature-card:hover {
+  border-color: #333;
+}
+
+.feature-icon {
+  font-size: 28px;
+  margin-bottom: 16px;
+  display: block;
+  filter: grayscale(1) brightness(0.9);
+}
+
+.feature-card h3 {
+  font-size: 17px;
+  font-weight: 600;
+  margin-bottom: 8px;
+  letter-spacing: -0.01em;
+}
+
+.feature-card p {
+  font-size: 14px;
+  color: #888;
+  line-height: 1.5;
+}
+
+/* Code blocks */
+
+.code-block {
+  background: #111;
+  border: 1px solid #222;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.code-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 16px;
+  border-bottom: 1px solid #222;
+  font-size: 12px;
+  color: #666;
+}
+
+.code-header button {
+  background: none;
+  border: 1px solid #333;
+  border-radius: 4px;
+  color: #888;
+  font-size: 11px;
+  padding: 3px 10px;
+  cursor: pointer;
+  font-family: system-ui, sans-serif;
+  transition: all 0.15s ease;
+}
+
+.code-header button:hover {
+  border-color: #555;
+  color: #ccc;
+}
+
+.code-block pre {
+  padding: 20px;
+  overflow-x: auto;
+  font-size: 13px;
+  line-height: 1.7;
+  color: #ccc;
+}
+
+.code-block .comment {
+  color: #555;
+}
+
+.code-block .command {
+  color: #e0e0e0;
+}
+
+.code-block .string {
+  color: #aaa;
+}
+
+/* Architecture */
+
+.arch-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+}
+
+.arch-card {
+  background: #0a0a0a;
+  border: 1px solid #1a1a1a;
+  border-radius: 10px;
+  padding: 28px 24px;
+  transition: border-color 0.2s ease;
+}
+
+.arch-card:hover {
+  border-color: #333;
+}
+
+.arch-card h3 {
+  font-size: 15px;
+  font-weight: 600;
+  margin-bottom: 4px;
+  font-family: 'SF Mono', Menlo, Consolas, monospace;
+  letter-spacing: -0.01em;
+}
+
+.arch-card .arch-type {
+  font-size: 12px;
+  color: #555;
+  margin-bottom: 12px;
+}
+
+.arch-card p {
+  font-size: 14px;
+  color: #888;
+  line-height: 1.5;
+}
+
+/* Platforms table */
+
+.table-wrap {
+  overflow-x: auto;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+thead th {
+  text-align: left;
+  padding: 12px 16px;
+  border-bottom: 1px solid #333;
+  color: #888;
+  font-weight: 500;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+tbody td {
+  padding: 14px 16px;
+  border-bottom: 1px solid #151515;
+  color: #ccc;
+}
+
+tbody tr:hover {
+  background: #0a0a0a;
+}
+
+tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.status {
+  display: inline-block;
+  padding: 2px 10px;
+  border-radius: 100px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.status-production {
+  background: #1a1a1a;
+  color: #ccc;
+  border: 1px solid #333;
+}
+
+.status-beta {
+  background: #111;
+  color: #888;
+  border: 1px solid #282828;
+}
+
+.status-soon {
+  background: #0a0a0a;
+  color: #555;
+  border: 1px solid #1a1a1a;
+}
+
+/* Footer */
+
+footer {
+  padding: 48px 0;
+  border-top: 1px solid #222;
+}
+
+.footer-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.footer-links {
+  display: flex;
+  gap: 24px;
+  font-size: 13px;
+}
+
+.footer-links a {
+  color: #666;
+}
+
+.footer-links a:hover {
+  color: #f5f5f5;
+  opacity: 1;
+}
+
+.footer-copy {
+  font-size: 13px;
+  color: #444;
+}
+
+/* Responsive */
+
+@media (max-width: 768px) {
+  section {
+    padding: 60px 0;
+  }
+
+  .hero {
+    padding: 120px 0 60px;
+  }
+
+  .features-grid,
+  .arch-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .nav-links {
+    display: none;
+  }
+
+  .footer-inner {
+    flex-direction: column;
+    gap: 16px;
+    text-align: center;
+  }
+
+  .install-block {
+    font-size: 12px;
+    padding: 12px 16px;
+    word-break: break-all;
+  }
+}
+
+@media (max-width: 480px) {
+  .container {
+    padding: 0 16px;
+  }
+
+  .feature-card,
+  .arch-card {
+    padding: 24px 20px;
+  }
+}
+</style>
+</head>
+<body>
+
+<!-- Nav -->
+<nav>
+  <div class="nav-inner">
+    <a href="#" class="nav-brand">
+      <span class="nav-logo">H</span>
+      Hanzo Edge
+    </a>
+    <div class="nav-links">
+      <a href="#features">Features</a>
+      <a href="#quickstart">Quick Start</a>
+      <a href="#architecture">Architecture</a>
+      <a href="#platforms">Platforms</a>
+      <a href="#api">API</a>
+      <a href="https://github.com/hanzoai/edge">GitHub</a>
+    </div>
+  </div>
+</nav>
+
+<!-- Hero -->
+<section class="hero">
+  <div class="container">
+    <h1>Hanzo Edge</h1>
+    <p class="tagline">Run AI models on any device.</p>
+    <div class="install-block" onclick="copyInstall(this)">
+      <span class="copy-hint">Click to copy</span>
+      curl -sSL https://edge.hanzo.ai/install.sh | sh
+    </div>
+  </div>
+</section>
+
+<!-- Features -->
+<section id="features">
+  <div class="container">
+    <div class="section-label">Why Edge</div>
+    <h2 class="section-title">AI inference without compromise.</h2>
+    <div class="features-grid">
+      <div class="feature-card">
+        <span class="feature-icon">&#9632;</span>
+        <h3>On-Device</h3>
+        <p>Run models locally. No cloud dependency, no network latency, full data privacy. Your data never leaves the device.</p>
+      </div>
+      <div class="feature-card">
+        <span class="feature-icon">&#9674;</span>
+        <h3>Cross-Platform</h3>
+        <p>One runtime for macOS, Linux, Windows, iOS, Android, and Web via WebAssembly. Build once, deploy everywhere.</p>
+      </div>
+      <div class="feature-card">
+        <span class="feature-icon">&#9650;</span>
+        <h3>GGUF Native</h3>
+        <p>First-class support for quantized GGUF models. Run Q4, Q5, and Q8 variants with optimized memory footprint.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Quick Start -->
+<section id="quickstart">
+  <div class="container">
+    <div class="section-label">Get Started</div>
+    <h2 class="section-title">Up and running in seconds.</h2>
+    <div class="code-block">
+      <div class="code-header">
+        <span>Terminal</span>
+        <button onclick="copyCode(this)">Copy</button>
+      </div>
+      <pre><span class="comment"># Install</span>
+<span class="command">curl -sSL https://edge.hanzo.ai/install.sh | sh</span>
+
+<span class="comment"># Or via cargo</span>
+<span class="command">cargo install hanzo-edge</span>
+
+<span class="comment"># Run a model</span>
+<span class="command">hanzo-edge run zenlm/zen4-mini-gguf -p <span class="string">"Hello, world!"</span></span>
+
+<span class="comment"># Start OpenAI-compatible server</span>
+<span class="command">hanzo-edge serve zenlm/zen4-mini-gguf --port 8080</span></pre>
+    </div>
+  </div>
+</section>
+
+<!-- Architecture -->
+<section id="architecture">
+  <div class="container">
+    <div class="section-label">Architecture</div>
+    <h2 class="section-title">Three crates. One runtime.</h2>
+    <div class="arch-grid">
+      <div class="arch-card">
+        <h3>hanzo-edge-core</h3>
+        <div class="arch-type">Library</div>
+        <p>Core inference runtime. GGUF model loading, token sampling, tokenization, and hardware-accelerated tensor operations via Hanzo ML.</p>
+      </div>
+      <div class="arch-card">
+        <h3>hanzo-edge</h3>
+        <div class="arch-type">CLI Binary</div>
+        <p>Command-line interface. Run interactive sessions, inspect model metadata, benchmark throughput, and serve an OpenAI-compatible HTTP API.</p>
+      </div>
+      <div class="arch-card">
+        <h3>hanzo-edge-wasm</h3>
+        <div class="arch-type">WebAssembly</div>
+        <p>Browser inference via WebAssembly. Load models from URLs or IndexedDB and run completions entirely client-side.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Platforms -->
+<section id="platforms">
+  <div class="container">
+    <div class="section-label">Platforms</div>
+    <h2 class="section-title">Run anywhere hardware exists.</h2>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Platform</th>
+            <th>Backend</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>macOS (Apple Silicon)</td>
+            <td>Metal</td>
+            <td><span class="status status-production">Production</span></td>
+          </tr>
+          <tr>
+            <td>macOS (Intel)</td>
+            <td>CPU / Accelerate</td>
+            <td><span class="status status-production">Production</span></td>
+          </tr>
+          <tr>
+            <td>Linux (x86_64)</td>
+            <td>CPU / CUDA</td>
+            <td><span class="status status-production">Production</span></td>
+          </tr>
+          <tr>
+            <td>Linux (ARM64)</td>
+            <td>CPU</td>
+            <td><span class="status status-production">Production</span></td>
+          </tr>
+          <tr>
+            <td>Web (WASM)</td>
+            <td>CPU</td>
+            <td><span class="status status-beta">Beta</span></td>
+          </tr>
+          <tr>
+            <td>iOS</td>
+            <td>Metal / CoreML</td>
+            <td><span class="status status-soon">Coming Soon</span></td>
+          </tr>
+          <tr>
+            <td>Android</td>
+            <td>Vulkan / CPU</td>
+            <td><span class="status status-soon">Coming Soon</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- API -->
+<section id="api">
+  <div class="container">
+    <div class="section-label">API</div>
+    <h2 class="section-title">OpenAI-compatible. Drop-in replacement.</h2>
+    <p style="color: #888; font-size: 15px; margin-bottom: 32px; max-width: 600px;">
+      Start a local server and use any OpenAI-compatible client library. No code changes needed.
+    </p>
+    <div class="code-block">
+      <div class="code-header">
+        <span>HTTP Request</span>
+        <button onclick="copyCode(this)">Copy</button>
+      </div>
+      <pre><span class="command">curl http://localhost:8080/v1/chat/completions \</span>
+<span class="command">  -H <span class="string">"Content-Type: application/json"</span> \</span>
+<span class="command">  -d <span class="string">'{
+    "model": "zen4-mini",
+    "messages": [
+      {"role": "user", "content": "Hi"}
+    ]
+  }'</span></span></pre>
+    </div>
+    <div style="margin-top: 24px;">
+      <div class="code-block">
+        <div class="code-header">
+          <span>Python</span>
+          <button onclick="copyCode(this)">Copy</button>
+        </div>
+        <pre><span class="command">from openai import OpenAI</span>
+
+<span class="command">client = OpenAI(</span>
+<span class="command">    base_url=<span class="string">"http://localhost:8080/v1"</span>,</span>
+<span class="command">    api_key=<span class="string">"not-needed"</span></span>
+<span class="command">)</span>
+
+<span class="command">response = client.chat.completions.create(</span>
+<span class="command">    model=<span class="string">"zen4-mini"</span>,</span>
+<span class="command">    messages=[{<span class="string">"role"</span>: <span class="string">"user"</span>, <span class="string">"content"</span>: <span class="string">"Hello"</span>}]</span>
+<span class="command">)</span>
+
+<span class="command">print(response.choices[0].message.content)</span></pre>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Footer -->
+<footer>
+  <div class="container">
+    <div class="footer-inner">
+      <div class="footer-links">
+        <a href="https://github.com/hanzoai/edge">GitHub</a>
+        <a href="https://crates.io/crates/hanzo-edge">Crates.io</a>
+        <a href="https://docs.rs/hanzo-edge">Docs</a>
+        <a href="https://hanzo.ai">Hanzo AI</a>
+      </div>
+      <div class="footer-copy">&copy; 2026 Hanzo AI Inc.</div>
+    </div>
+  </div>
+</footer>
+
+<script>
+function copyInstall(el) {
+  var text = 'curl -sSL https://edge.hanzo.ai/install.sh | sh';
+  navigator.clipboard.writeText(text).then(function() {
+    el.classList.add('copied');
+    el.querySelector('.copy-hint').textContent = 'Copied!';
+    setTimeout(function() {
+      el.classList.remove('copied');
+      el.querySelector('.copy-hint').textContent = 'Click to copy';
+    }, 2000);
+  });
+}
+
+function copyCode(btn) {
+  var pre = btn.closest('.code-block').querySelector('pre');
+  var text = pre.textContent;
+  navigator.clipboard.writeText(text).then(function() {
+    btn.textContent = 'Copied';
+    setTimeout(function() {
+      btn.textContent = 'Copy';
+    }, 2000);
+  });
+}
+</script>
+
+</body>
+</html>

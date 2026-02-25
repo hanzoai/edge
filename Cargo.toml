@@ -14,9 +14,9 @@ repository = "https://github.com/hanzoai/edge"
 description = "Hanzo Edge - On-device AI inference runtime"
 
 [workspace.dependencies]
-candle-core = { git = "https://github.com/hanzoai/ml" }
-candle-nn = { git = "https://github.com/hanzoai/ml" }
-candle-transformers = { git = "https://github.com/hanzoai/ml" }
+candle-core = "0.9"
+candle-nn = "0.9"
+candle-transformers = "0.9"
 tokenizers = { version = "0.20", default-features = false, features = ["onig"] }
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
