@@ -4,7 +4,7 @@
 //! on-device using Hanzo ML (Candle) as the tensor backend.
 
 use anyhow::Result;
-use candle_core::{Device, Tensor};
+use candle_core::Device;
 use serde::{Deserialize, Serialize};
 
 pub mod model;
