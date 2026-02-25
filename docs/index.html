@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Hanzo Edge - On-Device AI Inference Runtime</title>
-<meta name="description" content="Run AI models on any device. On-device inference runtime for macOS, Linux, Windows, iOS, Android, and Web.">
+<title>Hanzo Edge - Deploy AI Across Mobile, Web, and Embedded Applications</title>
+<meta name="description" content="Full AI edge stack: SDKs, runtime, model tools, and cloud API. On-device inference with zero cloud dependency across macOS, Linux, iOS, Android, Web, and embedded.">
 <meta name="theme-color" content="#000000">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' fill='%23000'/><text x='50' y='72' font-family='system-ui' font-size='64' font-weight='700' fill='%23fff' text-anchor='middle'>H</text></svg>">
 <style>
@@ -49,9 +49,15 @@ code, pre {
   padding: 0 24px;
 }
 
+.container-wide {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
 section {
-  padding: 80px 0;
-  border-bottom: 1px solid #222;
+  padding: 96px 0;
+  border-bottom: 1px solid #1a1a1a;
 }
 
 section:last-of-type {
@@ -66,10 +72,10 @@ nav {
   left: 0;
   right: 0;
   z-index: 100;
-  background: rgba(0, 0, 0, 0.85);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border-bottom: 1px solid #222;
+  background: rgba(0, 0, 0, 0.88);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-bottom: 1px solid #1a1a1a;
   padding: 0 24px;
   height: 56px;
   display: flex;
@@ -77,7 +83,7 @@ nav {
 }
 
 .nav-inner {
-  max-width: 1080px;
+  max-width: 1200px;
   margin: 0 auto;
   width: 100%;
   display: flex;
@@ -115,6 +121,7 @@ nav {
 
 .nav-links a {
   color: #888;
+  transition: color 0.15s ease;
 }
 
 .nav-links a:hover {
@@ -125,23 +132,34 @@ nav {
 /* Hero */
 
 .hero {
-  padding: 160px 0 100px;
+  padding: 160px 0 120px;
   text-align: center;
 }
 
 .hero h1 {
-  font-size: clamp(48px, 8vw, 80px);
+  font-size: clamp(52px, 8vw, 84px);
   font-weight: 800;
   letter-spacing: -0.04em;
-  line-height: 1.05;
-  margin-bottom: 16px;
+  line-height: 1.0;
+  margin-bottom: 20px;
 }
 
 .hero .tagline {
-  font-size: clamp(18px, 3vw, 22px);
-  color: #888;
-  margin-bottom: 48px;
+  font-size: clamp(20px, 3vw, 26px);
+  color: #ccc;
+  margin-bottom: 16px;
   font-weight: 400;
+  letter-spacing: -0.01em;
+}
+
+.hero .sub {
+  font-size: clamp(15px, 2vw, 17px);
+  color: #666;
+  margin-bottom: 48px;
+  max-width: 640px;
+  margin-left: auto;
+  margin-right: auto;
+  line-height: 1.6;
 }
 
 .install-block {
@@ -185,71 +203,264 @@ nav {
   color: #aaa;
 }
 
+.hero-ctas {
+  display: flex;
+  gap: 16px;
+  justify-content: center;
+  margin-top: 32px;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 28px;
+  border-radius: 8px;
+  font-size: 15px;
+  font-weight: 600;
+  transition: all 0.15s ease;
+  cursor: pointer;
+  border: none;
+  font-family: inherit;
+}
+
+.btn-primary {
+  background: #f5f5f5;
+  color: #000;
+}
+
+.btn-primary:hover {
+  background: #ddd;
+  opacity: 1;
+}
+
+.btn-secondary {
+  background: transparent;
+  color: #f5f5f5;
+  border: 1px solid #333;
+}
+
+.btn-secondary:hover {
+  border-color: #555;
+  opacity: 1;
+}
+
 /* Section headers */
 
 .section-label {
   font-size: 12px;
   text-transform: uppercase;
   letter-spacing: 0.12em;
-  color: #666;
+  color: #555;
   margin-bottom: 12px;
   font-weight: 600;
 }
 
 .section-title {
-  font-size: clamp(28px, 4vw, 36px);
+  font-size: clamp(28px, 4vw, 40px);
   font-weight: 700;
   letter-spacing: -0.03em;
+  margin-bottom: 16px;
+  line-height: 1.15;
+}
+
+.section-desc {
+  font-size: 16px;
+  color: #888;
+  max-width: 640px;
+  line-height: 1.6;
   margin-bottom: 48px;
 }
 
-/* Features grid */
+/* Value Props Grid (4 cols) */
 
-.features-grid {
+.value-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(4, 1fr);
   gap: 20px;
 }
 
-.feature-card {
+.value-card {
   background: #0a0a0a;
   border: 1px solid #1a1a1a;
   border-radius: 10px;
-  padding: 32px 28px;
+  padding: 32px 24px;
   transition: border-color 0.2s ease;
 }
 
-.feature-card:hover {
+.value-card:hover {
   border-color: #333;
 }
 
-.feature-icon {
-  font-size: 28px;
-  margin-bottom: 16px;
-  display: block;
-  filter: grayscale(1) brightness(0.9);
+.value-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  background: #111;
+  border: 1px solid #222;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 20px;
+  font-size: 18px;
 }
 
-.feature-card h3 {
+.value-icon svg {
+  width: 20px;
+  height: 20px;
+  stroke: #888;
+  fill: none;
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.value-card h3 {
   font-size: 17px;
   font-weight: 600;
   margin-bottom: 8px;
   letter-spacing: -0.01em;
 }
 
-.feature-card p {
+.value-card p {
   font-size: 14px;
   color: #888;
-  line-height: 1.5;
+  line-height: 1.55;
+}
+
+/* Two-column cards */
+
+.two-col {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+.solution-card {
+  background: #0a0a0a;
+  border: 1px solid #1a1a1a;
+  border-radius: 12px;
+  padding: 36px 32px;
+  transition: border-color 0.2s ease;
+}
+
+.solution-card:hover {
+  border-color: #333;
+}
+
+.solution-card h3 {
+  font-size: 20px;
+  font-weight: 700;
+  margin-bottom: 4px;
+  letter-spacing: -0.02em;
+}
+
+.solution-card .solution-sub {
+  font-size: 14px;
+  color: #555;
+  margin-bottom: 16px;
+}
+
+.solution-card p {
+  font-size: 14px;
+  color: #888;
+  line-height: 1.55;
+  margin-bottom: 20px;
+}
+
+.model-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+
+.model-tag {
+  display: inline-block;
+  background: #111;
+  border: 1px solid #222;
+  border-radius: 6px;
+  padding: 4px 12px;
+  font-size: 13px;
+  color: #aaa;
+  font-family: 'SF Mono', Menlo, Consolas, monospace;
+}
+
+.solution-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #ccc;
+}
+
+.solution-link:hover {
+  color: #fff;
+  opacity: 1;
+}
+
+.solution-link svg {
+  width: 14px;
+  height: 14px;
+  stroke: currentColor;
+  fill: none;
+  stroke-width: 2;
+}
+
+/* SDK Tabs */
+
+.sdk-tabs {
+  display: flex;
+  gap: 0;
+  border-bottom: 1px solid #222;
+  margin-bottom: 0;
+  overflow-x: auto;
+}
+
+.sdk-tab {
+  padding: 12px 20px;
+  font-size: 14px;
+  color: #666;
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+  background: none;
+  border-top: none;
+  border-left: none;
+  border-right: none;
+  font-family: inherit;
+}
+
+.sdk-tab:hover {
+  color: #aaa;
+}
+
+.sdk-tab.active {
+  color: #f5f5f5;
+  border-bottom-color: #f5f5f5;
+}
+
+.sdk-panel {
+  display: none;
+}
+
+.sdk-panel.active {
+  display: block;
 }
 
 /* Code blocks */
 
 .code-block {
-  background: #111;
-  border: 1px solid #222;
-  border-radius: 8px;
+  background: #0a0a0a;
+  border: 1px solid #1a1a1a;
+  border-radius: 0 0 10px 10px;
   overflow: hidden;
+}
+
+.code-block.standalone {
+  border-radius: 10px;
 }
 
 .code-header {
@@ -257,16 +468,16 @@ nav {
   align-items: center;
   justify-content: space-between;
   padding: 10px 16px;
-  border-bottom: 1px solid #222;
+  border-bottom: 1px solid #1a1a1a;
   font-size: 12px;
-  color: #666;
+  color: #555;
 }
 
 .code-header button {
   background: none;
-  border: 1px solid #333;
+  border: 1px solid #282828;
   border-radius: 4px;
-  color: #888;
+  color: #666;
   font-size: 11px;
   padding: 3px 10px;
   cursor: pointer;
@@ -275,74 +486,74 @@ nav {
 }
 
 .code-header button:hover {
-  border-color: #555;
-  color: #ccc;
+  border-color: #444;
+  color: #aaa;
 }
 
 .code-block pre {
-  padding: 20px;
+  padding: 24px;
   overflow-x: auto;
   font-size: 13px;
   line-height: 1.7;
   color: #ccc;
 }
 
-.code-block .comment {
-  color: #555;
-}
+.code-block .comment { color: #444; }
+.code-block .keyword { color: #888; }
+.code-block .string { color: #999; }
+.code-block .command { color: #ddd; }
+.code-block .type { color: #aaa; }
+.code-block .func { color: #bbb; }
 
-.code-block .command {
-  color: #e0e0e0;
-}
+/* Steps */
 
-.code-block .string {
-  color: #aaa;
-}
-
-/* Architecture */
-
-.arch-grid {
+.steps-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 20px;
+  gap: 32px;
 }
 
-.arch-card {
-  background: #0a0a0a;
-  border: 1px solid #1a1a1a;
-  border-radius: 10px;
-  padding: 28px 24px;
-  transition: border-color 0.2s ease;
+.step {
+  text-align: center;
 }
 
-.arch-card:hover {
-  border-color: #333;
+.step-number {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: #111;
+  border: 1px solid #222;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  font-weight: 700;
+  color: #888;
+  margin-bottom: 20px;
 }
 
-.arch-card h3 {
-  font-size: 15px;
+.step h3 {
+  font-size: 18px;
   font-weight: 600;
-  margin-bottom: 4px;
-  font-family: 'SF Mono', Menlo, Consolas, monospace;
+  margin-bottom: 8px;
   letter-spacing: -0.01em;
 }
 
-.arch-card .arch-type {
-  font-size: 12px;
-  color: #555;
-  margin-bottom: 12px;
-}
-
-.arch-card p {
+.step p {
   font-size: 14px;
   color: #888;
-  line-height: 1.5;
+  line-height: 1.55;
+  max-width: 300px;
+  margin: 0 auto;
 }
 
 /* Platforms table */
 
 .table-wrap {
   overflow-x: auto;
+  background: #0a0a0a;
+  border: 1px solid #1a1a1a;
+  border-radius: 10px;
 }
 
 table {
@@ -353,9 +564,9 @@ table {
 
 thead th {
   text-align: left;
-  padding: 12px 16px;
-  border-bottom: 1px solid #333;
-  color: #888;
+  padding: 14px 20px;
+  border-bottom: 1px solid #1a1a1a;
+  color: #666;
   font-weight: 500;
   font-size: 12px;
   text-transform: uppercase;
@@ -363,13 +574,13 @@ thead th {
 }
 
 tbody td {
-  padding: 14px 16px;
-  border-bottom: 1px solid #151515;
-  color: #ccc;
+  padding: 14px 20px;
+  border-bottom: 1px solid #111;
+  color: #bbb;
 }
 
 tbody tr:hover {
-  background: #0a0a0a;
+  background: #0e0e0e;
 }
 
 tbody tr:last-child td {
@@ -378,22 +589,22 @@ tbody tr:last-child td {
 
 .status {
   display: inline-block;
-  padding: 2px 10px;
+  padding: 3px 12px;
   border-radius: 100px;
   font-size: 12px;
   font-weight: 500;
 }
 
 .status-production {
-  background: #1a1a1a;
+  background: #151515;
   color: #ccc;
   border: 1px solid #333;
 }
 
 .status-beta {
-  background: #111;
+  background: #101010;
   color: #888;
-  border: 1px solid #282828;
+  border: 1px solid #252525;
 }
 
 .status-soon {
@@ -402,11 +613,111 @@ tbody tr:last-child td {
   border: 1px solid #1a1a1a;
 }
 
+/* Cloud API section */
+
+.cloud-section {
+  text-align: center;
+}
+
+.cloud-section .section-desc {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.cloud-code-wrap {
+  max-width: 640px;
+  margin: 0 auto;
+  text-align: left;
+}
+
+/* Comparison table */
+
+.comparison-wrap {
+  overflow-x: auto;
+  background: #0a0a0a;
+  border: 1px solid #1a1a1a;
+  border-radius: 10px;
+}
+
+.comparison-wrap table th:first-child,
+.comparison-wrap table td:first-child {
+  color: #f5f5f5;
+  font-weight: 600;
+}
+
+.comparison-wrap thead th {
+  text-transform: none;
+  letter-spacing: -0.01em;
+  font-size: 15px;
+  font-weight: 600;
+  color: #f5f5f5;
+}
+
+.comparison-wrap thead th:first-child {
+  color: #666;
+  font-weight: 500;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+/* Crates / Packages */
+
+.crates-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+}
+
+.crate-card {
+  background: #0a0a0a;
+  border: 1px solid #1a1a1a;
+  border-radius: 10px;
+  padding: 32px 24px;
+  transition: border-color 0.2s ease;
+}
+
+.crate-card:hover {
+  border-color: #333;
+}
+
+.crate-card h3 {
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 8px;
+  font-family: 'SF Mono', Menlo, Consolas, monospace;
+  letter-spacing: -0.01em;
+}
+
+.crate-card p {
+  font-size: 14px;
+  color: #888;
+  line-height: 1.5;
+  margin-bottom: 16px;
+}
+
+.crate-install {
+  display: block;
+  background: #111;
+  border: 1px solid #1a1a1a;
+  border-radius: 6px;
+  padding: 8px 14px;
+  font-family: 'SF Mono', Menlo, Consolas, monospace;
+  font-size: 12px;
+  color: #777;
+  cursor: pointer;
+  transition: border-color 0.15s ease;
+}
+
+.crate-install:hover {
+  border-color: #333;
+}
+
 /* Footer */
 
 footer {
   padding: 48px 0;
-  border-top: 1px solid #222;
+  border-top: 1px solid #1a1a1a;
 }
 
 .footer-inner {
@@ -422,7 +733,8 @@ footer {
 }
 
 .footer-links a {
-  color: #666;
+  color: #555;
+  transition: color 0.15s ease;
 }
 
 .footer-links a:hover {
@@ -432,22 +744,33 @@ footer {
 
 .footer-copy {
   font-size: 13px;
-  color: #444;
+  color: #333;
 }
 
 /* Responsive */
 
+@media (max-width: 1024px) {
+  .value-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
 @media (max-width: 768px) {
   section {
-    padding: 60px 0;
+    padding: 64px 0;
   }
 
   .hero {
-    padding: 120px 0 60px;
+    padding: 120px 0 80px;
   }
 
-  .features-grid,
-  .arch-grid {
+  .value-grid,
+  .steps-grid,
+  .crates-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .two-col {
     grid-template-columns: 1fr;
   }
 
@@ -466,16 +789,36 @@ footer {
     padding: 12px 16px;
     word-break: break-all;
   }
+
+  .hero-ctas {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .sdk-tabs {
+    gap: 0;
+  }
+
+  .sdk-tab {
+    padding: 10px 14px;
+    font-size: 13px;
+  }
 }
 
 @media (max-width: 480px) {
-  .container {
+  .container, .container-wide {
     padding: 0 16px;
   }
 
-  .feature-card,
-  .arch-card {
+  .value-card,
+  .solution-card,
+  .crate-card {
     padding: 24px 20px;
+  }
+
+  .code-block pre {
+    padding: 16px;
+    font-size: 12px;
   }
 }
 </style>
@@ -491,112 +834,351 @@ footer {
     </a>
     <div class="nav-links">
       <a href="#features">Features</a>
-      <a href="#quickstart">Quick Start</a>
-      <a href="#architecture">Architecture</a>
+      <a href="#solutions">Solutions</a>
+      <a href="#sdks">SDKs</a>
       <a href="#platforms">Platforms</a>
-      <a href="#api">API</a>
+      <a href="#cloud">Cloud API</a>
+      <a href="#compare">Compare</a>
       <a href="https://github.com/hanzoai/edge">GitHub</a>
     </div>
   </div>
 </nav>
 
-<!-- Hero -->
+<!-- ============================================ -->
+<!-- 1. Hero                                      -->
+<!-- ============================================ -->
 <section class="hero">
   <div class="container">
     <h1>Hanzo Edge</h1>
-    <p class="tagline">Run AI models on any device.</p>
+    <p class="tagline">Deploy AI across mobile, web, and embedded applications.</p>
+    <p class="sub">On-device inference with zero cloud dependency. Or use our cloud API for the same models at scale.</p>
     <div class="install-block" onclick="copyInstall(this)">
       <span class="copy-hint">Click to copy</span>
       curl -sSL https://edge.hanzo.ai/install.sh | sh
     </div>
-  </div>
-</section>
-
-<!-- Features -->
-<section id="features">
-  <div class="container">
-    <div class="section-label">Why Edge</div>
-    <h2 class="section-title">AI inference without compromise.</h2>
-    <div class="features-grid">
-      <div class="feature-card">
-        <span class="feature-icon">&#9632;</span>
-        <h3>On-Device</h3>
-        <p>Run models locally. No cloud dependency, no network latency, full data privacy. Your data never leaves the device.</p>
-      </div>
-      <div class="feature-card">
-        <span class="feature-icon">&#9674;</span>
-        <h3>Cross-Platform</h3>
-        <p>One runtime for macOS, Linux, Windows, iOS, Android, and Web via WebAssembly. Build once, deploy everywhere.</p>
-      </div>
-      <div class="feature-card">
-        <span class="feature-icon">&#9650;</span>
-        <h3>GGUF Native</h3>
-        <p>First-class support for quantized GGUF models. Run Q4, Q5, and Q8 variants with optimized memory footprint.</p>
-      </div>
+    <div class="hero-ctas">
+      <a href="#quickstart" class="btn btn-primary">Get Started</a>
+      <a href="https://hanzo.ai/api" class="btn btn-secondary">Cloud API &#8599;</a>
     </div>
   </div>
 </section>
 
-<!-- Quick Start -->
+<!-- ============================================ -->
+<!-- 2. Value Props (4 columns)                   -->
+<!-- ============================================ -->
+<section id="features">
+  <div class="container-wide">
+    <div class="section-label">Why Hanzo Edge</div>
+    <h2 class="section-title">A full AI edge stack.</h2>
+    <p class="section-desc">SDKs, optimized runtime, model tools, and a cloud API. Everything you need to deploy AI on any device.</p>
+    <div class="value-grid">
+
+      <div class="value-card">
+        <div class="value-icon">
+          <svg viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M12 11V6"/><circle cx="12" cy="4" r="2"/></svg>
+        </div>
+        <h3>On Device</h3>
+        <p>Reduce latency. Work offline. Keep data local and private. No cloud round-trips, no data leaves the device.</p>
+      </div>
+
+      <div class="value-card">
+        <div class="value-icon">
+          <svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8"/><path d="M12 17v4"/></svg>
+        </div>
+        <h3>Cross Platform</h3>
+        <p>Run the same model across macOS, Linux, iOS, Android, Web, and embedded. One model, every surface.</p>
+      </div>
+
+      <div class="value-card">
+        <div class="value-icon">
+          <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+        </div>
+        <h3>Multi-Format</h3>
+        <p>Compatible with GGUF, SafeTensors, and ONNX models. Bring your own or use pre-optimized Zen models.</p>
+      </div>
+
+      <div class="value-card">
+        <div class="value-icon">
+          <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+        </div>
+        <h3>Full Stack</h3>
+        <p>Flexible SDKs, optimized runtime, hardware acceleration. Metal, CUDA, WebAssembly, Vulkan -- automatic detection.</p>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ============================================ -->
+<!-- 3. Ready-made solutions & SDKs               -->
+<!-- ============================================ -->
+<section id="solutions">
+  <div class="container-wide">
+    <div class="section-label">Solutions</div>
+    <h2 class="section-title">Ready-made solutions and flexible SDKs.</h2>
+    <p class="section-desc">Start with optimized Zen models or bring any GGUF model from Hugging Face. Edge runs them all.</p>
+    <div class="two-col">
+
+      <div class="solution-card">
+        <h3>Zen Models</h3>
+        <p class="solution-sub">Optimized for Edge</p>
+        <p>Pre-quantized models from 600M to 8B parameters, tuned for on-device inference. Download and run instantly.</p>
+        <div class="model-list">
+          <span class="model-tag">zen-nano (600M)</span>
+          <span class="model-tag">zen-eco (4B)</span>
+          <span class="model-tag">zen4-mini (8B)</span>
+        </div>
+        <a href="https://huggingface.co/zenlm" class="solution-link">
+          Browse models on Hugging Face
+          <svg viewBox="0 0 24 24"><path d="M7 17L17 7"/><path d="M7 7h10v10"/></svg>
+        </a>
+      </div>
+
+      <div class="solution-card">
+        <h3>Bring Your Own Model</h3>
+        <p class="solution-sub">Any GGUF from Hugging Face</p>
+        <p>Convert and run any GGUF model directly. Supports all major open-weight architectures out of the box.</p>
+        <div class="model-list">
+          <span class="model-tag">Llama</span>
+          <span class="model-tag">Qwen</span>
+          <span class="model-tag">Phi</span>
+          <span class="model-tag">Gemma</span>
+          <span class="model-tag">Mistral</span>
+          <span class="model-tag">SmolLM</span>
+        </div>
+        <a href="https://huggingface.co/models?library=gguf" class="solution-link">
+          Find GGUF models
+          <svg viewBox="0 0 24 24"><path d="M7 17L17 7"/><path d="M7 7h10v10"/></svg>
+        </a>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ============================================ -->
+<!-- 4. Platform SDKs (tabbed)                    -->
+<!-- ============================================ -->
+<section id="sdks">
+  <div class="container">
+    <div class="section-label">Platform SDKs</div>
+    <h2 class="section-title">One runtime. Every platform.</h2>
+    <p class="section-desc">Native SDKs for Rust, CLI, JavaScript/WASM, Python, Swift, and Kotlin. Same models, same API surface, every device.</p>
+
+    <div class="sdk-tabs" role="tablist">
+      <button class="sdk-tab active" onclick="switchTab(event, 'tab-cli')" role="tab">CLI</button>
+      <button class="sdk-tab" onclick="switchTab(event, 'tab-rust')" role="tab">Rust</button>
+      <button class="sdk-tab" onclick="switchTab(event, 'tab-js')" role="tab">JavaScript / WASM</button>
+      <button class="sdk-tab" onclick="switchTab(event, 'tab-python')" role="tab">Python</button>
+      <button class="sdk-tab" onclick="switchTab(event, 'tab-swift')" role="tab">Swift</button>
+      <button class="sdk-tab" onclick="switchTab(event, 'tab-kotlin')" role="tab">Kotlin</button>
+    </div>
+
+    <!-- CLI -->
+    <div id="tab-cli" class="sdk-panel active">
+      <div class="code-block">
+        <div class="code-header">
+          <span>Terminal</span>
+          <button onclick="copyCode(this)">Copy</button>
+        </div>
+        <pre><span class="comment"># Run interactive chat</span>
+<span class="command">hanzo-edge run zenlm/zen4-mini-gguf</span>
+
+<span class="comment"># Single prompt</span>
+<span class="command">hanzo-edge run zenlm/zen4-mini-gguf -p <span class="string">"Explain quantum computing"</span></span>
+
+<span class="comment"># Serve OpenAI-compatible API</span>
+<span class="command">hanzo-edge serve zenlm/zen4-mini-gguf --port 8080</span>
+
+<span class="comment"># Inspect model metadata</span>
+<span class="command">hanzo-edge inspect zenlm/zen4-mini-gguf</span>
+
+<span class="comment"># Benchmark throughput</span>
+<span class="command">hanzo-edge bench zenlm/zen4-mini-gguf --tokens 512</span></pre>
+      </div>
+    </div>
+
+    <!-- Rust -->
+    <div id="tab-rust" class="sdk-panel">
+      <div class="code-block">
+        <div class="code-header">
+          <span>Rust</span>
+          <button onclick="copyCode(this)">Copy</button>
+        </div>
+        <pre><span class="keyword">use</span> <span class="type">hanzo_edge_core</span>::{<span class="type">load_model</span>, <span class="type">InferenceSession</span>, <span class="type">SamplingParams</span>};
+
+<span class="keyword">fn</span> <span class="func">main</span>() -> <span class="type">Result</span>&lt;(), <span class="type">Box</span>&lt;<span class="keyword">dyn</span> <span class="type">std::error::Error</span>&gt;&gt; {
+    <span class="keyword">let</span> model = <span class="func">load_model</span>(<span class="string">"zenlm/zen4-mini-gguf"</span>, <span class="type">None</span>)?;
+    <span class="keyword">let</span> session = <span class="type">InferenceSession</span>::<span class="func">new</span>(model, <span class="type">SamplingParams</span>::<span class="func">default</span>());
+
+    <span class="keyword">let</span> output = session.<span class="func">generate</span>(<span class="string">"Explain quantum computing"</span>)?;
+    <span class="func">println!</span>(<span class="string">"{output}"</span>);
+
+    <span class="type">Ok</span>(())
+}</pre>
+      </div>
+    </div>
+
+    <!-- JavaScript / WASM -->
+    <div id="tab-js" class="sdk-panel">
+      <div class="code-block">
+        <div class="code-header">
+          <span>JavaScript / WASM</span>
+          <button onclick="copyCode(this)">Copy</button>
+        </div>
+        <pre><span class="keyword">import</span> { <span class="type">EdgeModel</span> } <span class="keyword">from</span> <span class="string">'hanzo-edge-wasm'</span>;
+
+<span class="comment">// Load model bytes (from fetch, IndexedDB, etc.)</span>
+<span class="keyword">const</span> model = <span class="keyword">await</span> <span class="type">EdgeModel</span>.<span class="func">new</span>(modelBytes, tokenizerBytes);
+
+<span class="comment">// Streaming generation</span>
+model.<span class="func">generate_stream</span>(<span class="string">"Hello!"</span>, (token) => {
+  process.stdout.<span class="func">write</span>(token);
+});
+
+<span class="comment">// Or await full response</span>
+<span class="keyword">const</span> response = <span class="keyword">await</span> model.<span class="func">generate</span>(<span class="string">"Explain quantum computing"</span>);
+console.<span class="func">log</span>(response);</pre>
+      </div>
+    </div>
+
+    <!-- Python -->
+    <div id="tab-python" class="sdk-panel">
+      <div class="code-block">
+        <div class="code-header">
+          <span>Python (via local REST API)</span>
+          <button onclick="copyCode(this)">Copy</button>
+        </div>
+        <pre><span class="keyword">from</span> openai <span class="keyword">import</span> <span class="type">OpenAI</span>
+
+<span class="comment"># Connect to local hanzo-edge server</span>
+client = <span class="type">OpenAI</span>(
+    base_url=<span class="string">"http://localhost:8080/v1"</span>,
+    api_key=<span class="string">"local"</span>
+)
+
+response = client.chat.completions.<span class="func">create</span>(
+    model=<span class="string">"zen4-mini"</span>,
+    messages=[{<span class="string">"role"</span>: <span class="string">"user"</span>, <span class="string">"content"</span>: <span class="string">"Hello!"</span>}]
+)
+
+<span class="func">print</span>(response.choices[<span class="type">0</span>].message.content)</pre>
+      </div>
+    </div>
+
+    <!-- Swift -->
+    <div id="tab-swift" class="sdk-panel">
+      <div class="code-block">
+        <div class="code-header">
+          <span>Swift (Coming Soon)</span>
+          <button onclick="copyCode(this)">Copy</button>
+        </div>
+        <pre><span class="keyword">import</span> <span class="type">HanzoEdge</span>
+
+<span class="keyword">let</span> model = <span class="keyword">try</span> <span class="type">EdgeModel</span>(path: <span class="string">"zen4-mini.gguf"</span>)
+
+<span class="comment">// Single generation</span>
+<span class="keyword">let</span> response = <span class="keyword">try</span> model.<span class="func">generate</span>(<span class="string">"Hello, world!"</span>)
+<span class="func">print</span>(response)
+
+<span class="comment">// Streaming</span>
+<span class="keyword">for try await</span> token <span class="keyword">in</span> model.<span class="func">stream</span>(<span class="string">"Explain quantum computing"</span>) {
+    <span class="func">print</span>(token, terminator: <span class="string">""</span>)
+}</pre>
+      </div>
+    </div>
+
+    <!-- Kotlin -->
+    <div id="tab-kotlin" class="sdk-panel">
+      <div class="code-block">
+        <div class="code-header">
+          <span>Kotlin (Coming Soon)</span>
+          <button onclick="copyCode(this)">Copy</button>
+        </div>
+        <pre><span class="keyword">import</span> <span class="type">ai.hanzo.edge.EdgeModel</span>
+
+<span class="keyword">val</span> model = <span class="type">EdgeModel</span>.<span class="func">load</span>(<span class="string">"zen4-mini.gguf"</span>)
+
+<span class="comment">// Single generation</span>
+<span class="keyword">val</span> response = model.<span class="func">generate</span>(<span class="string">"Hello, world!"</span>)
+<span class="func">println</span>(response)
+
+<span class="comment">// Streaming with coroutines</span>
+model.<span class="func">stream</span>(<span class="string">"Explain quantum computing"</span>).<span class="func">collect</span> { token ->
+    <span class="func">print</span>(token)
+}</pre>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ============================================ -->
+<!-- 5. How It Works (3 steps)                    -->
+<!-- ============================================ -->
 <section id="quickstart">
   <div class="container">
-    <div class="section-label">Get Started</div>
-    <h2 class="section-title">Up and running in seconds.</h2>
-    <div class="code-block">
-      <div class="code-header">
-        <span>Terminal</span>
-        <button onclick="copyCode(this)">Copy</button>
+    <div class="section-label">How It Works</div>
+    <h2 class="section-title">Three steps to on-device AI.</h2>
+    <p class="section-desc">From model selection to hardware-accelerated inference in minutes.</p>
+
+    <div class="steps-grid">
+      <div class="step">
+        <div class="step-number">1</div>
+        <h3>Pick a model</h3>
+        <p>Choose from pre-optimized Zen models or bring any GGUF from Hugging Face. Models are downloaded and cached automatically.</p>
       </div>
-      <pre><span class="comment"># Install</span>
+      <div class="step">
+        <div class="step-number">2</div>
+        <h3>Deploy anywhere</h3>
+        <p>Run via CLI, serve a REST API, embed in your app with a native SDK, or load in the browser with WASM.</p>
+      </div>
+      <div class="step">
+        <div class="step-number">3</div>
+        <h3>Accelerate</h3>
+        <p>Automatic hardware detection. Metal on macOS and iOS, CUDA on Linux, CPU everywhere. Zero configuration needed.</p>
+      </div>
+    </div>
+
+    <div style="margin-top: 56px;">
+      <div class="code-block standalone">
+        <div class="code-header">
+          <span>Quick Start</span>
+          <button onclick="copyCode(this)">Copy</button>
+        </div>
+        <pre><span class="comment"># Install Hanzo Edge</span>
 <span class="command">curl -sSL https://edge.hanzo.ai/install.sh | sh</span>
 
-<span class="comment"># Or via cargo</span>
+<span class="comment"># Or install via Cargo</span>
 <span class="command">cargo install hanzo-edge</span>
 
-<span class="comment"># Run a model</span>
-<span class="command">hanzo-edge run zenlm/zen4-mini-gguf -p <span class="string">"Hello, world!"</span></span>
+<span class="comment"># Run a Zen model (downloads automatically)</span>
+<span class="command">hanzo-edge run zenlm/zen4-mini-gguf</span>
 
-<span class="comment"># Start OpenAI-compatible server</span>
+<span class="comment"># Or run any GGUF from Hugging Face</span>
+<span class="command">hanzo-edge run TheBloke/Llama-2-7B-Chat-GGUF</span>
+
+<span class="comment"># Start a local OpenAI-compatible server</span>
 <span class="command">hanzo-edge serve zenlm/zen4-mini-gguf --port 8080</span></pre>
-    </div>
-  </div>
-</section>
-
-<!-- Architecture -->
-<section id="architecture">
-  <div class="container">
-    <div class="section-label">Architecture</div>
-    <h2 class="section-title">Three crates. One runtime.</h2>
-    <div class="arch-grid">
-      <div class="arch-card">
-        <h3>hanzo-edge-core</h3>
-        <div class="arch-type">Library</div>
-        <p>Core inference runtime. GGUF model loading, token sampling, tokenization, and hardware-accelerated tensor operations via Hanzo ML.</p>
-      </div>
-      <div class="arch-card">
-        <h3>hanzo-edge</h3>
-        <div class="arch-type">CLI Binary</div>
-        <p>Command-line interface. Run interactive sessions, inspect model metadata, benchmark throughput, and serve an OpenAI-compatible HTTP API.</p>
-      </div>
-      <div class="arch-card">
-        <h3>hanzo-edge-wasm</h3>
-        <div class="arch-type">WebAssembly</div>
-        <p>Browser inference via WebAssembly. Load models from URLs or IndexedDB and run completions entirely client-side.</p>
       </div>
     </div>
   </div>
 </section>
 
-<!-- Platforms -->
+<!-- ============================================ -->
+<!-- 6. Platform Support Table                    -->
+<!-- ============================================ -->
 <section id="platforms">
   <div class="container">
-    <div class="section-label">Platforms</div>
+    <div class="section-label">Platform Support</div>
     <h2 class="section-title">Run anywhere hardware exists.</h2>
+    <p class="section-desc">Production-ready on desktop and server. Expanding to mobile, web, and embedded.</p>
     <div class="table-wrap">
       <table>
         <thead>
           <tr>
             <th>Platform</th>
+            <th>SDK</th>
             <th>Backend</th>
             <th>Status</th>
           </tr>
@@ -604,37 +1186,44 @@ footer {
         <tbody>
           <tr>
             <td>macOS (Apple Silicon)</td>
+            <td>Rust, CLI</td>
             <td>Metal</td>
             <td><span class="status status-production">Production</span></td>
           </tr>
           <tr>
             <td>macOS (Intel)</td>
+            <td>Rust, CLI</td>
             <td>CPU / Accelerate</td>
             <td><span class="status status-production">Production</span></td>
           </tr>
           <tr>
-            <td>Linux (x86_64)</td>
+            <td>Linux x86_64</td>
+            <td>Rust, CLI</td>
             <td>CPU / CUDA</td>
             <td><span class="status status-production">Production</span></td>
           </tr>
           <tr>
-            <td>Linux (ARM64)</td>
+            <td>Linux ARM64</td>
+            <td>Rust, CLI</td>
             <td>CPU</td>
             <td><span class="status status-production">Production</span></td>
           </tr>
           <tr>
-            <td>Web (WASM)</td>
+            <td>Web</td>
+            <td>JavaScript / WASM</td>
             <td>CPU</td>
             <td><span class="status status-beta">Beta</span></td>
           </tr>
           <tr>
             <td>iOS</td>
+            <td>Swift</td>
             <td>Metal / CoreML</td>
             <td><span class="status status-soon">Coming Soon</span></td>
           </tr>
           <tr>
             <td>Android</td>
-            <td>Vulkan / CPU</td>
+            <td>Kotlin</td>
+            <td>Vulkan / NNAPI</td>
             <td><span class="status status-soon">Coming Soon</span></td>
           </tr>
         </tbody>
@@ -643,53 +1232,141 @@ footer {
   </div>
 </section>
 
-<!-- API -->
-<section id="api">
+<!-- ============================================ -->
+<!-- 7. Cloud API                                 -->
+<!-- ============================================ -->
+<section id="cloud" class="cloud-section">
   <div class="container">
-    <div class="section-label">API</div>
-    <h2 class="section-title">OpenAI-compatible. Drop-in replacement.</h2>
-    <p style="color: #888; font-size: 15px; margin-bottom: 32px; max-width: 600px;">
-      Start a local server and use any OpenAI-compatible client library. No code changes needed.
-    </p>
-    <div class="code-block">
-      <div class="code-header">
-        <span>HTTP Request</span>
-        <button onclick="copyCode(this)">Copy</button>
-      </div>
-      <pre><span class="command">curl http://localhost:8080/v1/chat/completions \</span>
+    <div class="section-label">Cloud API</div>
+    <h2 class="section-title">Same models, cloud scale.</h2>
+    <p class="section-desc">Use the Hanzo Cloud API for server-side inference when you need it. Same Zen models, same API format, auto-scaling infrastructure.</p>
+
+    <div class="cloud-code-wrap">
+      <div class="code-block standalone">
+        <div class="code-header">
+          <span>Hanzo Cloud API</span>
+          <button onclick="copyCode(this)">Copy</button>
+        </div>
+        <pre><span class="command">curl https://api.hanzo.ai/v1/chat/completions \</span>
+<span class="command">  -H <span class="string">"Authorization: Bearer $HANZO_API_KEY"</span> \</span>
 <span class="command">  -H <span class="string">"Content-Type: application/json"</span> \</span>
 <span class="command">  -d <span class="string">'{
     "model": "zen4-mini",
     "messages": [
-      {"role": "user", "content": "Hi"}
+      {"role": "user", "content": "Hello!"}
     ]
   }'</span></span></pre>
-    </div>
-    <div style="margin-top: 24px;">
-      <div class="code-block">
-        <div class="code-header">
-          <span>Python</span>
-          <button onclick="copyCode(this)">Copy</button>
-        </div>
-        <pre><span class="command">from openai import OpenAI</span>
-
-<span class="command">client = OpenAI(</span>
-<span class="command">    base_url=<span class="string">"http://localhost:8080/v1"</span>,</span>
-<span class="command">    api_key=<span class="string">"not-needed"</span></span>
-<span class="command">)</span>
-
-<span class="command">response = client.chat.completions.create(</span>
-<span class="command">    model=<span class="string">"zen4-mini"</span>,</span>
-<span class="command">    messages=[{<span class="string">"role"</span>: <span class="string">"user"</span>, <span class="string">"content"</span>: <span class="string">"Hello"</span>}]</span>
-<span class="command">)</span>
-
-<span class="command">print(response.choices[0].message.content)</span></pre>
       </div>
+    </div>
+
+    <div style="margin-top: 32px;">
+      <a href="https://hanzo.ai/api" class="btn btn-secondary">Get API Keys &#8599;</a>
     </div>
   </div>
 </section>
 
-<!-- Footer -->
+<!-- ============================================ -->
+<!-- 8. Comparison: Edge vs Engine vs Cloud        -->
+<!-- ============================================ -->
+<section id="compare">
+  <div class="container">
+    <div class="section-label">Compare</div>
+    <h2 class="section-title">Choose the right deployment.</h2>
+    <p class="section-desc">Edge for on-device, Engine for your servers, Cloud API for managed infrastructure.</p>
+    <div class="comparison-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th></th>
+            <th>Edge</th>
+            <th>Engine</th>
+            <th>Cloud API</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Where</td>
+            <td>Your device</td>
+            <td>Your server</td>
+            <td>Hanzo servers</td>
+          </tr>
+          <tr>
+            <td>Models</td>
+            <td>GGUF quantized</td>
+            <td>All formats</td>
+            <td>All formats</td>
+          </tr>
+          <tr>
+            <td>GPU</td>
+            <td>Metal, CPU, WASM</td>
+            <td>CUDA, Metal</td>
+            <td>NVIDIA A100/H100</td>
+          </tr>
+          <tr>
+            <td>Latency</td>
+            <td>~0ms network</td>
+            <td>~0ms network</td>
+            <td>~50ms network</td>
+          </tr>
+          <tr>
+            <td>Privacy</td>
+            <td>Full local</td>
+            <td>Your infra</td>
+            <td>Hanzo managed</td>
+          </tr>
+          <tr>
+            <td>Scale</td>
+            <td>Single user</td>
+            <td>Multi-user</td>
+            <td>Auto-scaling</td>
+          </tr>
+          <tr>
+            <td>Pricing</td>
+            <td>Free / OSS</td>
+            <td>Free / OSS</td>
+            <td>Pay per token</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================ -->
+<!-- 9. Crates & Packages                         -->
+<!-- ============================================ -->
+<section id="crates">
+  <div class="container">
+    <div class="section-label">Packages</div>
+    <h2 class="section-title">Crates and packages.</h2>
+    <p class="section-desc">Install the runtime, the CLI, or the WASM binding independently. All open source.</p>
+    <div class="crates-grid">
+
+      <div class="crate-card">
+        <h3>hanzo-edge-core</h3>
+        <p>Core inference runtime library. Model loading, tokenization, sampling, and hardware-accelerated tensor ops.</p>
+        <span class="crate-install" onclick="copyCrate(this, 'cargo add hanzo-edge-core')">cargo add hanzo-edge-core</span>
+      </div>
+
+      <div class="crate-card">
+        <h3>hanzo-edge</h3>
+        <p>CLI binary. Interactive sessions, model inspection, benchmarking, and OpenAI-compatible HTTP server.</p>
+        <span class="crate-install" onclick="copyCrate(this, 'cargo install hanzo-edge')">cargo install hanzo-edge</span>
+      </div>
+
+      <div class="crate-card">
+        <h3>hanzo-edge-wasm</h3>
+        <p>Browser inference via WebAssembly. Load models from URLs or IndexedDB and run completions client-side.</p>
+        <span class="crate-install" onclick="copyCrate(this, 'cargo add hanzo-edge-wasm')">cargo add hanzo-edge-wasm</span>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ============================================ -->
+<!-- 10. Footer                                   -->
+<!-- ============================================ -->
 <footer>
   <div class="container">
     <div class="footer-inner">
@@ -698,6 +1375,7 @@ footer {
         <a href="https://crates.io/crates/hanzo-edge">Crates.io</a>
         <a href="https://docs.rs/hanzo-edge">Docs</a>
         <a href="https://hanzo.ai">Hanzo AI</a>
+        <a href="https://github.com/hanzoai/engine">Engine</a>
       </div>
       <div class="footer-copy">&copy; 2026 Hanzo AI Inc.</div>
     </div>
@@ -726,6 +1404,32 @@ function copyCode(btn) {
       btn.textContent = 'Copy';
     }, 2000);
   });
+}
+
+function copyCrate(el, text) {
+  navigator.clipboard.writeText(text).then(function() {
+    var original = el.textContent;
+    el.textContent = 'Copied!';
+    setTimeout(function() {
+      el.textContent = original;
+    }, 2000);
+  });
+}
+
+function switchTab(e, tabId) {
+  // Deactivate all tabs
+  var tabs = document.querySelectorAll('.sdk-tab');
+  for (var i = 0; i < tabs.length; i++) {
+    tabs[i].classList.remove('active');
+  }
+  // Deactivate all panels
+  var panels = document.querySelectorAll('.sdk-panel');
+  for (var i = 0; i < panels.length; i++) {
+    panels[i].classList.remove('active');
+  }
+  // Activate clicked tab and its panel
+  e.currentTarget.classList.add('active');
+  document.getElementById(tabId).classList.add('active');
 }
 </script>
 
