@@ -38,6 +38,7 @@ struct ServerState {
 // ---------------------------------------------------------------------------
 
 #[derive(Debug, Deserialize)]
+#[allow(dead_code)]
 struct ChatCompletionRequest {
     #[serde(default = "default_model")]
     model: String,
@@ -53,6 +54,7 @@ struct ChatCompletionRequest {
 }
 
 #[derive(Debug, Deserialize)]
+#[allow(dead_code)]
 struct CompletionRequest {
     #[serde(default = "default_model")]
     model: String,
@@ -366,8 +368,6 @@ async fn handle_chat_stream(
                 .forward(&input, 0)
                 .map_err(|e| anyhow::anyhow!("{e}"))?;
             let mut prev = sample_token(&logits, temperature, top_p)?;
-            let mut generated = 1usize;
-
             // Send first token.
             send_content_chunk(&tx, &id, &model_id, &state.tokenizer, prev);
 
@@ -382,7 +382,6 @@ async fn handle_chat_stream(
                     .forward(&input, pos)
                     .map_err(|e| anyhow::anyhow!("{e}"))?;
                 let token = sample_token(&logits, temperature, top_p)?;
-                generated += 1;
 
                 if is_eos(&state.tokenizer, token) {
                     break;

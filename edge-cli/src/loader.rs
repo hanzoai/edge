@@ -16,6 +16,7 @@ use indicatif::{ProgressBar, ProgressStyle};
 use tokenizers::Tokenizer;
 
 /// Everything needed for inference after loading.
+#[allow(dead_code)]
 pub struct LoadedModel {
     pub weights: ModelWeights,
     pub tokenizer: Tokenizer,

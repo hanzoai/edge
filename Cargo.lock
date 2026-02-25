@@ -785,7 +785,6 @@ dependencies = [
  "futures-core",
  "hf-hub",
  "indicatif",
- "libc",
  "serde",
  "serde_json",
  "tokenizers 0.20.4",
