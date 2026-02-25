@@ -1,19 +1,26 @@
-//! Hanzo Edge Core — on-device AI inference runtime.
+//! Hanzo Edge Core -- on-device AI inference runtime.
 //!
-//! Provides traits and implementations for running transformer models
-//! on-device using Hanzo ML (Candle) as the tensor backend.
+//! Loads GGUF-quantized transformer models from HuggingFace Hub
+//! and runs autoregressive generation using Candle as the tensor backend.
 
 use anyhow::Result;
 use candle_core::Device;
 use serde::{Deserialize, Serialize};
 
 pub mod model;
+pub mod sampling;
 pub mod session;
+pub mod tokenizer;
 
-pub use model::{Model, ModelConfig};
-pub use session::{InferenceSession, SamplingParams};
+pub use model::{Model, ModelArchitecture, ModelConfig};
+pub use sampling::{sample_token, SamplingParams};
+pub use session::InferenceSession;
+pub use tokenizer::TokenizerWrapper;
 
-/// Select the best available device for the current platform.
+/// Crate version.
+pub const VERSION: &str = env!("CARGO_PKG_VERSION");
+
+/// Select the best available compute device for the current platform.
 pub fn default_device() -> Result<Device> {
     #[cfg(feature = "metal")]
     {
@@ -34,7 +41,7 @@ pub fn default_device() -> Result<Device> {
     }
 }
 
-/// Token output from generation.
+/// Output from a generation call.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct GenerateOutput {
     pub text: String,

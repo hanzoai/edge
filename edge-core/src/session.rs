@@ -1,169 +1,222 @@
-//! Inference session: drives token-by-token generation.
+//! Inference session: drives token-by-token autoregressive generation.
 
 use anyhow::{bail, Result};
-use candle_core::{DType, Tensor};
-use serde::{Deserialize, Serialize};
+use candle_core::Tensor;
 
 use crate::model::Model;
+use crate::sampling::{sample_token, SamplingParams};
+use crate::tokenizer::TokenizerWrapper;
 use crate::GenerateOutput;
 
-/// Sampling parameters for text generation.
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct SamplingParams {
-    pub temperature: f64,
-    pub top_p: f64,
-    pub max_tokens: usize,
-    pub repeat_penalty: f32,
-}
-
-impl Default for SamplingParams {
-    fn default() -> Self {
-        Self {
-            temperature: 0.7,
-            top_p: 0.9,
-            max_tokens: 256,
-            repeat_penalty: 1.1,
-        }
-    }
-}
-
-/// Drives token-by-token generation from a model.
-pub struct InferenceSession {
+/// Drives autoregressive generation from a model + tokenizer pair.
+pub struct InferenceSession<'a> {
+    model: &'a mut dyn Model,
+    tokenizer: &'a TokenizerWrapper,
     params: SamplingParams,
 }
 
-impl InferenceSession {
-    pub fn new(params: SamplingParams) -> Self {
-        Self { params }
+impl<'a> InferenceSession<'a> {
+    pub fn new(
+        model: &'a mut dyn Model,
+        tokenizer: &'a TokenizerWrapper,
+        params: SamplingParams,
+    ) -> Self {
+        Self {
+            model,
+            tokenizer,
+            params,
+        }
     }
 
-    /// Generate text from a sequence of prompt token IDs.
+    /// Generate text for the given prompt.
     ///
-    /// Returns generated token IDs. The caller is responsible for
-    /// encoding the prompt and decoding the output via a tokenizer.
-    pub fn generate(
-        &self,
-        model: &mut dyn Model,
-        prompt_tokens: &[u32],
-    ) -> Result<Vec<u32>> {
+    /// Tokenizes the prompt, runs the prefill + decode loop,
+    /// and returns the full output including prompt and generation stats.
+    pub fn generate(&mut self, prompt: &str) -> Result<GenerateOutput> {
+        let prompt_tokens = self.tokenizer.encode(prompt, true)?;
         if prompt_tokens.is_empty() {
             bail!("prompt must not be empty");
         }
 
-        let device = model.device().clone();
+        let generated_ids = self.generate_from_tokens(&prompt_tokens)?;
+
+        let text = self.tokenizer.decode(&generated_ids, true)?;
+
+        Ok(GenerateOutput {
+            text,
+            tokens: generated_ids.clone(),
+            prompt_tokens: prompt_tokens.len(),
+            generated_tokens: generated_ids.len(),
+        })
+    }
+
+    /// Streaming generation: yields one decoded token string at a time.
+    ///
+    /// Returns an iterator of `Result<String>` where each item is
+    /// the text fragment for a single generated token.
+    pub fn generate_stream<'b>(
+        &'b mut self,
+        prompt: &str,
+    ) -> Result<StreamIter<'b, 'a>> {
+        let prompt_tokens = self.tokenizer.encode(prompt, true)?;
+        if prompt_tokens.is_empty() {
+            bail!("prompt must not be empty");
+        }
+
+        // Prefill: process entire prompt at once.
+        let device = self.model.device().clone();
+        let input = Tensor::new(prompt_tokens.as_slice(), &device)?.unsqueeze(0)?;
+        let logits = self.model.forward(&input, 0)?;
+        let first_token = sample_token(&logits, &self.params, &prompt_tokens)?;
+
+        let mut all_tokens = prompt_tokens.clone();
+        all_tokens.push(first_token);
+
+        Ok(StreamIter {
+            session: self,
+            all_tokens,
+            prompt_len: prompt_tokens.len(),
+            pos: prompt_tokens.len(), // next decode position
+            first_token: Some(first_token),
+            done: false,
+        })
+    }
+
+    /// Low-level generation from pre-tokenized input.
+    fn generate_from_tokens(&mut self, prompt_tokens: &[u32]) -> Result<Vec<u32>> {
+        let device = self.model.device().clone();
         let mut all_tokens = prompt_tokens.to_vec();
         let mut generated = Vec::new();
 
-        // Prefill: process the entire prompt.
+        // Prefill: full prompt in one forward pass.
         let input = Tensor::new(prompt_tokens, &device)?.unsqueeze(0)?;
-        let logits = model.forward(&input, 0)?;
-        let next_token = self.sample_token(&logits)?;
+        let logits = self.model.forward(&input, 0)?;
+        let mut next_token = sample_token(&logits, &self.params, &all_tokens)?;
         all_tokens.push(next_token);
         generated.push(next_token);
 
-        // Decode: generate one token at a time.
+        if self.tokenizer.is_eos(next_token) {
+            return Ok(generated);
+        }
+
+        // Decode loop: one token at a time.
         for i in 1..self.params.max_tokens {
             let pos = prompt_tokens.len() + i - 1;
-            if pos >= model.max_seq_len() {
+            if pos >= self.model.max_seq_len() {
+                tracing::warn!(pos, max = self.model.max_seq_len(), "reached max sequence length");
                 break;
             }
 
             let input = Tensor::new(&[next_token], &device)?.unsqueeze(0)?;
-            let logits = model.forward(&input, pos)?;
-            let next_token = self.sample_token(&logits)?;
+            let logits = self.model.forward(&input, pos)?;
+            next_token = sample_token(&logits, &self.params, &all_tokens)?;
+
+            if self.tokenizer.is_eos(next_token) {
+                break;
+            }
 
             all_tokens.push(next_token);
             generated.push(next_token);
-
-            // TODO: check for EOS token
         }
 
         Ok(generated)
     }
+}
 
-    /// Sample a single token from logits using temperature + top-p.
-    fn sample_token(&self, logits: &Tensor) -> Result<u32> {
-        let logits = logits.squeeze(0)?.to_dtype(DType::F32)?;
-        // Greedy for temperature ~0.
-        if self.params.temperature < 1e-7 {
-            let token = logits
-                .argmax(0)?
-                .to_scalar::<u32>()?;
-            return Ok(token);
+/// Iterator that yields one decoded token string per step.
+pub struct StreamIter<'b, 'a: 'b> {
+    session: &'b mut InferenceSession<'a>,
+    all_tokens: Vec<u32>,
+    prompt_len: usize,
+    pos: usize,
+    first_token: Option<u32>,
+    done: bool,
+}
+
+impl<'b, 'a: 'b> Iterator for StreamIter<'b, 'a> {
+    type Item = Result<String>;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        if self.done {
+            return None;
         }
 
-        // Temperature scaling.
-        let logits = (&logits / self.params.temperature)?;
-        let probs = candle_nn::ops::softmax(&logits, 0)?;
-        let probs_vec: Vec<f32> = probs.to_vec1()?;
+        let generated_count = self.all_tokens.len() - self.prompt_len;
+        if generated_count >= self.session.params.max_tokens {
+            self.done = true;
+            return None;
+        }
 
-        // Simple top-p nucleus sampling.
-        let mut indexed: Vec<(usize, f32)> = probs_vec.iter().copied().enumerate().collect();
-        indexed.sort_by(|a, b| b.1.partial_cmp(&a.1).unwrap());
-
-        let mut cumsum = 0.0;
-        let mut cutoff = indexed.len();
-        for (i, (_, p)) in indexed.iter().enumerate() {
-            cumsum += p;
-            if cumsum >= self.params.top_p as f32 {
-                cutoff = i + 1;
-                break;
+        // Yield the first token from prefill if we have it.
+        if let Some(tok) = self.first_token.take() {
+            if self.session.tokenizer.is_eos(tok) {
+                self.done = true;
+                return None;
             }
+            return Some(self.session.tokenizer.decode_one(tok));
         }
 
-        let candidates = &indexed[..cutoff];
-        let total: f32 = candidates.iter().map(|(_, p)| p).sum();
-        let r: f32 = rand_float() * total;
-
-        let mut acc = 0.0;
-        for &(idx, p) in candidates {
-            acc += p;
-            if acc >= r {
-                return Ok(idx as u32);
+        // Decode next token.
+        let last_token = match self.all_tokens.last() {
+            Some(&t) => t,
+            None => {
+                self.done = true;
+                return None;
             }
+        };
+
+        if self.pos >= self.session.model.max_seq_len() {
+            self.done = true;
+            return None;
         }
 
-        Ok(candidates.last().map(|(idx, _)| *idx as u32).unwrap_or(0))
+        let device = self.session.model.device().clone();
+        let input = match Tensor::new(&[last_token], &device).and_then(|t| t.unsqueeze(0)) {
+            Ok(t) => t,
+            Err(e) => {
+                self.done = true;
+                return Some(Err(anyhow::anyhow!("tensor creation: {e}")));
+            }
+        };
+
+        let logits = match self.session.model.forward(&input, self.pos) {
+            Ok(l) => l,
+            Err(e) => {
+                self.done = true;
+                return Some(Err(e));
+            }
+        };
+
+        let next_token =
+            match sample_token(&logits, &self.session.params, &self.all_tokens) {
+                Ok(t) => t,
+                Err(e) => {
+                    self.done = true;
+                    return Some(Err(e));
+                }
+            };
+
+        self.pos += 1;
+
+        if self.session.tokenizer.is_eos(next_token) {
+            self.done = true;
+            return None;
+        }
+
+        self.all_tokens.push(next_token);
+        Some(self.session.tokenizer.decode_one(next_token))
     }
 }
 
-/// Simple pseudo-random float [0, 1) without pulling in rand crate.
-fn rand_float() -> f32 {
-    // Use a timestamp-based seed for minimal randomness.
-    // In production, use a proper RNG.
-    use std::time::SystemTime;
-    let nanos = SystemTime::now()
-        .duration_since(SystemTime::UNIX_EPOCH)
-        .unwrap_or_default()
-        .subsec_nanos();
-    (nanos % 10000) as f32 / 10000.0
-}
-
-/// Convenience function: encode prompt, generate, decode.
+/// Convenience: encode prompt, generate, decode, return output.
 pub fn generate_text(
     model: &mut dyn Model,
-    tokenizer: &tokenizers::Tokenizer,
+    tokenizer: &TokenizerWrapper,
     prompt: &str,
     params: SamplingParams,
 ) -> Result<GenerateOutput> {
-    let encoding = tokenizer
-        .encode(prompt, true)
-        .map_err(|e| anyhow::anyhow!("tokenizer encode error: {e}"))?;
-    let prompt_tokens: Vec<u32> = encoding.get_ids().to_vec();
-
-    let session = InferenceSession::new(params);
-    let generated_ids = session.generate(model, &prompt_tokens)?;
-
-    let text = tokenizer
-        .decode(&generated_ids, true)
-        .map_err(|e| anyhow::anyhow!("tokenizer decode error: {e}"))?;
-
-    Ok(GenerateOutput {
-        text,
-        tokens: generated_ids.clone(),
-        prompt_tokens: prompt_tokens.len(),
-        generated_tokens: generated_ids.len(),
-    })
+    let mut session = InferenceSession::new(model, tokenizer, params);
+    session.generate(prompt)
 }
 
 #[cfg(test)]
@@ -171,10 +224,11 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_sampling_params_default() {
+    fn sampling_params_default_is_sane() {
         let p = SamplingParams::default();
         assert!(p.temperature > 0.0);
         assert!(p.top_p > 0.0 && p.top_p <= 1.0);
         assert!(p.max_tokens > 0);
+        assert!(p.top_k > 0);
     }
 }
