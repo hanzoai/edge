@@ -16,7 +16,7 @@ crate-type = ["cdylib", "rlib"]
 candle-core = { workspace = true }
 candle-nn = { workspace = true }
 candle-transformers = { workspace = true }
-tokenizers = { workspace = true, features = ["unstable_wasm"] }
+tokenizers = { version = "0.20", default-features = false, features = ["unstable_wasm"] }
 serde = { workspace = true }
 serde_json = { workspace = true }
 anyhow = { workspace = true }
@@ -25,5 +25,6 @@ js-sys = "0.3"
 web-sys = { version = "0.3", features = ["console"] }
 serde-wasm-bindgen = "0.6"
 getrandom = { version = "0.2", features = ["js"] }
+getrandom_03 = { package = "getrandom", version = "0.3", features = ["wasm_js"] }
 rand = "0.8"
 console_error_panic_hook = "0.1"
