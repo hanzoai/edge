@@ -6,7 +6,6 @@
 //!   GET  /v1/models
 
 use std::sync::{Arc, Mutex};
-use std::time::Instant;
 
 use anyhow::Result;
 use axum::extract::State;
