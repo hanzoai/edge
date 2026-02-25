@@ -84,8 +84,6 @@ impl InferenceSession {
     /// Sample a single token from logits using temperature + top-p.
     fn sample_token(&self, logits: &Tensor) -> Result<u32> {
         let logits = logits.squeeze(0)?.to_dtype(DType::F32)?;
-        let dim = logits.dim(0)?;
-
         // Greedy for temperature ~0.
         if self.params.temperature < 1e-7 {
             let token = logits

@@ -19,3 +19,8 @@ tracing = { workspace = true }
 tracing-subscriber = { workspace = true }
 clap = { version = "4", features = ["derive"] }
 hf-hub = "0.4"
+
+[features]
+default = []
+metal = ["edge-core/metal"]
+cuda = ["edge-core/cuda"]
