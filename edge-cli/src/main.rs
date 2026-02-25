@@ -122,7 +122,7 @@ fn main() -> Result<()> {
             top_p,
             revision,
         } => {
-            let device = edge_core::default_device()?;
+            let device = hanzo_edge_core::default_device()?;
             cmd::run::execute(
                 &model,
                 &prompt,
@@ -145,7 +145,7 @@ fn main() -> Result<()> {
             iterations,
             revision,
         } => {
-            let device = edge_core::default_device()?;
+            let device = hanzo_edge_core::default_device()?;
             cmd::bench::execute(
                 &model,
                 &prompt,
@@ -161,7 +161,7 @@ fn main() -> Result<()> {
             port,
             revision,
         } => {
-            let device = edge_core::default_device()?;
+            let device = hanzo_edge_core::default_device()?;
             let rt = tokio::runtime::Runtime::new()?;
             rt.block_on(cmd::serve::execute(
                 &model,

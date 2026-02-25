@@ -1,17 +1,20 @@
 [package]
-name = "edge-cli"
+name = "hanzo-edge"
 version.workspace = true
 edition.workspace = true
 license.workspace = true
 repository.workspace = true
-description = "CLI for Hanzo Edge on-device inference"
+description = "Hanzo Edge CLI — run AI models locally on any device"
+homepage = "https://edge.hanzo.ai"
+keywords = ["ai", "inference", "edge", "llm", "gguf"]
+categories = ["science", "command-line-utilities"]
 
 [[bin]]
 name = "hanzo-edge"
 path = "src/main.rs"
 
 [dependencies]
-edge-core = { path = "../edge-core" }
+hanzo-edge-core = { path = "../edge-core" }
 candle-core = { workspace = true }
 candle-nn = { workspace = true }
 candle-transformers = { workspace = true }
@@ -31,5 +34,5 @@ futures-core = "0.3"
 
 [features]
 default = []
-metal = ["edge-core/metal"]
-cuda = ["edge-core/cuda"]
+metal = ["hanzo-edge-core/metal"]
+cuda = ["hanzo-edge-core/cuda"]

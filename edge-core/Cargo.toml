@@ -1,10 +1,13 @@
 [package]
-name = "edge-core"
+name = "hanzo-edge-core"
 version.workspace = true
 edition.workspace = true
 license.workspace = true
 repository.workspace = true
-description = "Core inference runtime for Hanzo Edge"
+description = "Core inference runtime for Hanzo Edge — on-device AI with GGUF models"
+homepage = "https://edge.hanzo.ai"
+keywords = ["ai", "inference", "edge", "llm", "gguf"]
+categories = ["science", "command-line-utilities"]
 
 [dependencies]
 candle-core = { workspace = true }
