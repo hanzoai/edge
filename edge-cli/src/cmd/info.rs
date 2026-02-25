@@ -19,12 +19,22 @@ pub fn execute(model_id: &str, revision: Option<&str>) -> Result<()> {
     if !meta.name.is_empty() {
         println!("Name:           {}", meta.name);
     }
-    println!("Architecture:   {}", if meta.architecture.is_empty() { "unknown" } else { &meta.architecture });
+    println!(
+        "Architecture:   {}",
+        if meta.architecture.is_empty() {
+            "unknown"
+        } else {
+            &meta.architecture
+        }
+    );
     println!("Parameters:     {}", format_params(meta.param_count));
     println!("Context length: {}", meta.context_length);
     println!("Embedding dim:  {}", meta.embedding_length);
     println!("Layers:         {}", meta.block_count);
-    println!("Attention heads: {} (KV: {})", meta.head_count, meta.head_count_kv);
+    println!(
+        "Attention heads: {} (KV: {})",
+        meta.head_count, meta.head_count_kv
+    );
     println!("Quantization:   {}", meta.quantization);
     println!("File size:      {}", format_bytes(meta.file_size));
     println!("File:           {}", gguf_path.display());
@@ -40,8 +50,8 @@ pub fn execute(model_id: &str, revision: Option<&str>) -> Result<()> {
 
 /// Print all metadata key-value pairs from the GGUF header.
 fn print_raw_metadata(path: &Path) -> Result<()> {
-    let mut file = std::fs::File::open(path)
-        .with_context(|| format!("cannot open {}", path.display()))?;
+    let mut file =
+        std::fs::File::open(path).with_context(|| format!("cannot open {}", path.display()))?;
     let content = gguf_file::Content::read(&mut file)
         .map_err(|e| anyhow::anyhow!("failed to read GGUF: {e}"))?;
 

@@ -17,8 +17,8 @@ use axum::Router;
 use candle_core::{DType, Device, Tensor};
 use candle_transformers::models::quantized_llama::ModelWeights;
 use serde::{Deserialize, Serialize};
-use tokio::sync::oneshot;
 use tokenizers::Tokenizer;
+use tokio::sync::oneshot;
 
 use crate::loader;
 
@@ -224,9 +224,7 @@ async fn handle_health() -> &'static str {
     "ok"
 }
 
-async fn handle_models(
-    State(state): State<Arc<ServerState>>,
-) -> Json<ModelsResponse> {
+async fn handle_models(State(state): State<Arc<ServerState>>) -> Json<ModelsResponse> {
     Json(ModelsResponse {
         object: "list".to_string(),
         data: vec![ModelEntry {
@@ -251,7 +249,11 @@ async fn handle_chat_completions(
     let prompt = format_chat_prompt(&req.messages);
 
     if stream {
-        return Ok(handle_chat_stream(state, prompt, max_tokens, temperature, top_p).await.into_response());
+        return Ok(
+            handle_chat_stream(state, prompt, max_tokens, temperature, top_p)
+                .await
+                .into_response(),
+        );
     }
 
     // Non-streaming: generate all tokens, return complete response.
@@ -333,13 +335,17 @@ async fn handle_chat_stream(
     // Spawn blocking inference on a thread.
     tokio::task::spawn_blocking(move || {
         let run = || -> Result<()> {
-            let encoding = state.tokenizer
+            let encoding = state
+                .tokenizer
                 .encode(prompt.as_str(), true)
                 .map_err(|e| anyhow::anyhow!("encode: {e}"))?;
             let prompt_tokens = encoding.get_ids();
             let device = &state.device;
 
-            let mut weights = state.weights.lock().map_err(|e| anyhow::anyhow!("lock: {e}"))?;
+            let mut weights = state
+                .weights
+                .lock()
+                .map_err(|e| anyhow::anyhow!("lock: {e}"))?;
 
             // Send role delta.
             let chunk = ChatCompletionChunk {
@@ -474,7 +480,8 @@ async fn generate_blocking(
         let _ = tx.send(result);
     });
 
-    rx.await.map_err(|_| anyhow::anyhow!("generation task panicked"))?
+    rx.await
+        .map_err(|_| anyhow::anyhow!("generation task panicked"))?
 }
 
 fn generate_sync(
@@ -544,7 +551,10 @@ fn format_chat_prompt(messages: &[ChatMessage]) -> String {
     // Use a simple ChatML-style template.
     let mut prompt = String::new();
     for msg in messages {
-        prompt.push_str(&format!("<|im_start|>{}\n{}<|im_end|>\n", msg.role, msg.content));
+        prompt.push_str(&format!(
+            "<|im_start|>{}\n{}<|im_end|>\n",
+            msg.role, msg.content
+        ));
     }
     prompt.push_str("<|im_start|>assistant\n");
     prompt
@@ -552,9 +562,7 @@ fn format_chat_prompt(messages: &[ChatMessage]) -> String {
 
 /// Sample a token from logits.
 fn sample_token(logits: &Tensor, temperature: f64, top_p: f64) -> Result<u32> {
-    let logits = logits
-        .squeeze(0)
-        .map_err(|e| anyhow::anyhow!("{e}"))?;
+    let logits = logits.squeeze(0).map_err(|e| anyhow::anyhow!("{e}"))?;
     let logits = if logits.dims().len() == 2 {
         logits
             .get(logits.dim(0).map_err(|e| anyhow::anyhow!("{e}"))? - 1)

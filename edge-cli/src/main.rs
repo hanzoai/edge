@@ -134,9 +134,7 @@ fn main() -> Result<()> {
             )
         }
 
-        Commands::Info { model, revision } => {
-            cmd::info::execute(&model, revision.as_deref())
-        }
+        Commands::Info { model, revision } => cmd::info::execute(&model, revision.as_deref()),
 
         Commands::Bench {
             model,
