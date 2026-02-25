@@ -1,0 +1,25 @@
+[workspace]
+members = [
+    "edge-core",
+    "edge-cli",
+    "edge-wasm",
+]
+resolver = "2"
+
+[workspace.package]
+version = "0.1.0"
+edition = "2021"
+license = "Apache-2.0"
+repository = "https://github.com/hanzoai/edge"
+description = "Hanzo Edge - On-device AI inference runtime"
+
+[workspace.dependencies]
+candle-core = { git = "https://github.com/hanzoai/ml" }
+candle-nn = { git = "https://github.com/hanzoai/ml" }
+candle-transformers = { git = "https://github.com/hanzoai/ml" }
+tokenizers = { version = "0.20", default-features = false, features = ["onig"] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+anyhow = "1"
+tracing = "0.1"
+tracing-subscriber = "0.3"
