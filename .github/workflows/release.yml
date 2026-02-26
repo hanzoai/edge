@@ -74,7 +74,7 @@ jobs:
           EOF
 
       - name: Build
-        run: cargo build --release -p edge-cli --target ${{ matrix.target }}
+        run: cargo build --release -p hanzo-edge --target ${{ matrix.target }}
 
       - name: Strip binary (Linux)
         if: contains(matrix.target, 'linux') && !matrix.cross

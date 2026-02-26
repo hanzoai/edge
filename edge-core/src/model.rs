@@ -49,11 +49,11 @@ impl std::fmt::Display for ModelArchitecture {
 /// Configuration for downloading and loading a model.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ModelConfig {
-    /// HuggingFace model ID (e.g. "TheBloke/Llama-2-7B-Chat-GGUF")
+    /// HuggingFace model ID (e.g. "zenlm/zen3-nano")
     /// or an absolute path to a local GGUF file.
     pub model_id: String,
 
-    /// Specific filename within the HF repo (e.g. "llama-2-7b-chat.Q4_K_M.gguf").
+    /// Specific filename within the HF repo (e.g. "zen3-nano.Q4_K_M.gguf").
     /// Required for HF repos that contain multiple GGUF files.
     pub model_file: Option<String>,
 
@@ -71,8 +71,8 @@ pub struct ModelConfig {
 impl Default for ModelConfig {
     fn default() -> Self {
         Self {
-            model_id: "TheBloke/TinyLlama-1.1B-Chat-v1.0-GGUF".to_string(),
-            model_file: Some("tinyllama-1.1b-chat-v1.0.Q4_K_M.gguf".to_string()),
+            model_id: "zenlm/zen3-nano".to_string(),
+            model_file: Some("zen3-nano.Q4_K_M.gguf".to_string()),
             revision: None,
             architecture: None,
             device: None,

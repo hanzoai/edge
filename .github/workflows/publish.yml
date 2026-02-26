@@ -29,17 +29,17 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-cargo-publish-
 
-      - name: Publish edge-core
-        run: cargo publish -p edge-core --allow-dirty
+      - name: Publish hanzo-edge-core
+        run: cargo publish -p hanzo-edge-core --allow-dirty
 
       - name: Wait for crate index
         run: sleep 30
 
-      - name: Publish edge-cli
-        run: cargo publish -p edge-cli --allow-dirty
+      - name: Publish hanzo-edge
+        run: cargo publish -p hanzo-edge --allow-dirty
 
       - name: Wait for crate index
         run: sleep 30
 
-      - name: Publish edge-wasm
-        run: cargo publish -p edge-wasm --allow-dirty
+      - name: Publish hanzo-edge-wasm
+        run: cargo publish -p hanzo-edge-wasm --allow-dirty
