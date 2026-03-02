@@ -321,7 +321,7 @@ Hanzo Edge supports any GGUF model using these architectures:
 | Architecture | Zen Models |
 |-------------|------------|
 | Dense Transformer | zen3-nano (600M), zen-eco (4B), zen4-mini (8B) |
-| MoDE (Mixture of Distilled Experts) | zen4, zen4-pro, zen4-max, zen4-coder |
+| MoDE (Mixture of Diverse Experts) | zen4, zen4-pro, zen4-max, zen4-coder |
 | Grouped-Query Attention | zen3-vl, zen3-omni |
 | Vision-Language | zen3-vl (multimodal) |
 
