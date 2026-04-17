@@ -1,0 +1,9 @@
+.git
+*.md
+LICENSE
+.vscode/
+.idea/
+.env*
+target/debug/
+target/doc/
+docs/
