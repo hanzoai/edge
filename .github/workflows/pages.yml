@@ -17,7 +17,7 @@ concurrency:
 
 jobs:
   deploy:
-    runs-on: ubuntu-latest
+    runs-on: hanzo-deploy-linux-amd64
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
