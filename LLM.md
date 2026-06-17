@@ -1,4 +1,4 @@
-# LLM.md - Hanzo Edge
+# Hanzo Edge
 
 ## Overview
 > On-device AI inference -- deploy Zen models across mobile, web, and embedded applications
