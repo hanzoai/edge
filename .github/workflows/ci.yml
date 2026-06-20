@@ -45,7 +45,7 @@ jobs:
 
   fmt:
     name: rustfmt
-    runs-on: ubuntu-latest
+    runs-on: hanzo-build-linux-amd64
     steps:
       - uses: actions/checkout@v4
 
