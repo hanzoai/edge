@@ -1,3 +1,5 @@
+<p align="center"><img src=".github/hero.svg" alt="edge" width="880"></p>
+
 # Hanzo Edge
 
 > On-device AI inference -- deploy Zen models across mobile, web, and embedded applications
