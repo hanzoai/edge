@@ -1,0 +1,9 @@
+# edge-wasm is excluded from the host gate by the repo's own structure: it is a
+# wasm32 crate (crate-type cdylib, wasm-bindgen/js-sys/web-sys) with its own
+# `make build-wasm` target, and it pins tokenizers with `unstable_wasm` where
+# the workspace pins `onig` — cargo unifies features across a whole-workspace
+# build, so `--workspace` would resolve tokenizers to a combination neither
+# target asks for. These two crates are the host-buildable product.
+test:
+  - name: build
+    run: cargo test -p hanzo-edge-core -p hanzo-edge
