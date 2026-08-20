@@ -1,0 +1,37 @@
+name: site
+
+# edge.hanzo.ai, served from the object-store plane.
+#
+# `docs/` is the whole page: one index.html, the install.sh it links, and a CNAME
+# file left from GitHub Pages. Nothing builds it, so this syncs the directory to
+# s3://hanzo-sites/hanzo/edge, which `edge-static` in universe serves.
+#
+# The host used to resolve to a Cloudflare Pages project outside this account,
+# which meant the page could not be rebuilt or rolled back from here. It can now.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'docs/**'
+      - '.hanzo/workflows/site.yml'
+  workflow_dispatch:
+
+concurrency:
+  group: site-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  site:
+    runs-on: hanzo-build-linux-amd64
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Publish to the Sites plane
+        uses: hanzoai/ci/.github/actions/site@v1
+        with:
+          slug: edge-site
+          dir: docs
+        env:
+          KMS_CLIENT_ID: ${{ secrets.KMS_CLIENT_ID }}
+          KMS_CLIENT_SECRET: ${{ secrets.KMS_CLIENT_SECRET }}
