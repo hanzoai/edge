@@ -14,7 +14,7 @@ on:
     branches: [main]
     paths:
       - 'docs/**'
-      - '.hanzo/workflows/site.yml'
+      - '.github/workflows/site.yml'
   workflow_dispatch:
 
 concurrency:
