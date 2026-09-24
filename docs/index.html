@@ -1383,23 +1383,43 @@ model.<span class="func">stream</span>(<span class="string">"Explain quantum com
 </footer>
 
 <script>
+// Put text on the clipboard. writeText is a promise the browser may refuse (no
+// clipboard-write permission, an embedding frame, an insecure context); where it
+// does, select `node` instead so one keystroke still copies it. Resolves true when
+// the clipboard took the text.
+function copy(text, node) {
+  var write = navigator.clipboard && navigator.clipboard.writeText
+    ? navigator.clipboard.writeText(text)
+    : Promise.reject(new Error('no clipboard'));
+  return write.then(function() { return true; }, function() {
+    var range = document.createRange();
+    range.selectNodeContents(node);
+    var selection = window.getSelection();
+    selection.removeAllRanges();
+    selection.addRange(range);
+    return false;
+  });
+}
+
+var SELECTED = 'Selected, press Ctrl+C';
+
 function copyInstall(el) {
   var text = 'curl -sSL https://edge.hanzo.ai/install.sh | sh';
-  navigator.clipboard.writeText(text).then(function() {
-    el.classList.add('copied');
-    el.querySelector('.copy-hint').textContent = 'Copied!';
+  var hint = el.querySelector('.copy-hint');
+  copy(text, el.lastChild).then(function(ok) {
+    if (ok) el.classList.add('copied');
+    hint.textContent = ok ? 'Copied!' : SELECTED;
     setTimeout(function() {
       el.classList.remove('copied');
-      el.querySelector('.copy-hint').textContent = 'Click to copy';
+      hint.textContent = 'Click to copy';
     }, 2000);
   });
 }
 
 function copyCode(btn) {
   var pre = btn.closest('.code-block').querySelector('pre');
-  var text = pre.textContent;
-  navigator.clipboard.writeText(text).then(function() {
-    btn.textContent = 'Copied';
+  copy(pre.textContent, pre).then(function(ok) {
+    btn.textContent = ok ? 'Copied' : SELECTED;
     setTimeout(function() {
       btn.textContent = 'Copy';
     }, 2000);
@@ -1407,8 +1427,9 @@ function copyCode(btn) {
 }
 
 function copyCrate(el, text) {
-  navigator.clipboard.writeText(text).then(function() {
-    var original = el.textContent;
+  var original = el.textContent;
+  copy(text, el).then(function(ok) {
+    if (!ok) return; // the command stays selected in place; its label is the command
     el.textContent = 'Copied!';
     setTimeout(function() {
       el.textContent = original;
