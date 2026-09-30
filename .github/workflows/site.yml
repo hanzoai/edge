@@ -23,6 +23,9 @@ concurrency:
 
 jobs:
   site:
+    permissions:
+      contents: read
+      id-token: write
     runs-on: [linux-amd64]
     timeout-minutes: 10
     steps:
