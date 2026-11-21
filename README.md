@@ -2,6 +2,8 @@
 
 # Hanzo Edge
 
+[![Open in Hanzo](https://hanzo.app/badges/open-in-hanzo.svg)](https://hanzo.app/dev/open?repo=github.com/hanzoai/edge&ref=main&action=open) [![Edit with Hanzo](https://hanzo.app/badges/edit-with-hanzo.svg)](https://hanzo.app/dev/open?repo=github.com/hanzoai/edge&ref=main&action=edit) [![Deploy with Hanzo](https://hanzo.app/badges/deploy-with-hanzo.svg)](https://hanzo.app/dev/open?repo=github.com/hanzoai/edge&ref=main&action=deploy)
+
 Hanzo Edge is an on-device inference runtime. It loads a quantized GGUF model
 off local disk and generates tokens on the machine it is running on — a laptop,
 a phone, a browser tab, an ARM board. Nothing is sent anywhere. There is no
